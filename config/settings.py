@@ -10,6 +10,9 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/6.0/ref/settings/
 """
 
+import os
+from dotenv import load_dotenv
+
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -72,12 +75,35 @@ WSGI_APPLICATION = "config.wsgi.application"
 # Database
 # https://docs.djangoproject.com/en/6.0/ref/settings/#databases
 
+load_dotenv()
+USER = os.getenv('MS_SQL_USER')
+PASSWORD = os.getenv("MS_SQL_KEY")
+HOST = os.getenv("MS_SQL_SERVER")
+DATABASE = os.getenv("MS_SQL_DATABASE")
+DRIVER = os.getenv("MS_SQL_DRIVER")
+PAD_DATABASE = os.getenv('MS_SQL_PAD_DATABASE')
+
 DATABASES = {
     "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR / "db.sqlite3",
+        "ENGINE": "mssql",
+        "NAME": DATABASE,
+        'PASSWORD': PASSWORD,
+        'HOST': HOST,
+        'PORT': '',
+        'OPTIONS': {
+            'driver': DRIVER,
+            'extra_params': 'TrustServerCertificate=yes;',
+
+        }
     }
 }
+
+# DATABASES = {
+#     "default": {
+#         "ENGINE": "django.db.backends.sqlite3",
+#         "NAME": BASE_DIR / "db.sqlite3",
+#     }
+# }
 
 
 # Password validation
@@ -102,7 +128,7 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/6.0/topics/i18n/
 
-LANGUAGE_CODE = "en-us"
+LANGUAGE_CODE = "ru-ru"
 
 TIME_ZONE = "UTC"
 
@@ -115,3 +141,38 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/6.0/howto/static-files/
 
 STATIC_URL = "static/"
+# STATICFILES_DIRS = (
+#     BASE_DIR / 'static',
+# )
+# MEDIA_URL = '/media/'
+# MEDIA_ROOT = (
+#     BASE_DIR / 'media'
+# )
+
+DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+# AUTH_USER_MODEL = 'users.User'
+# LOGIN_REDIRECT_URL = "dogs:index"
+# LOGOUT_REDIRECT_URL = "dogs:index"
+# LOGIN_URL = 'users:user_login'
+# CACHE_ENABLED = os.getenv("CACHE_ENABLED") == 'True'
+# if CACHE_ENABLED:
+#     CACHES = {
+#         "default":
+#             {
+#                 'BACKEND': 'django.core.cache.backends.redis.RedisCache',
+#                 'LOCATION': os.getenv("CACHE_LOCATION"),
+#             }
+#     }
+#
+#
+# EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+# EMAIL_HOST = 'smtp.yandex.com'
+# EMAIL_PORT = 465
+# EMAIL_HOST_USER = os.getenv("EMAIL_HOST_USER")
+# EMAIL_HOST_PASSWORD = os.getenv("YANDEX_PASSWORD_APP")
+# EMAIL_USE_TLS = False
+# EMAIL_USE_SSL = True
+#
+# EMAIL_SERVER = EMAIL_HOST_USER
+# DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
+# EMAIL_ADMIN = EMAIL_HOST_USER

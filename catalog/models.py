@@ -1,5 +1,6 @@
 from django.db import models
 from django.core.validators import MinValueValidator
+from django.urls import reverse
 
 from users.models import NULLABLE
 
@@ -35,3 +36,32 @@ class Product(models.Model):
             self.save()
             return True
         return False
+
+
+class Category(models.Model):
+    """Категории товаров"""
+    name = models.CharField(max_length=100, verbose_name='Название категории')
+    slug = models.SlugField(unique=True, verbose_name='URL-метка', **NULLABLE)
+    parent = models.ForeignKey('self', on_delete=models.CASCADE, **NULLABLE, related_name='children', verbose_name='Родительская категория')
+    description = models.TextField(verbose_name='Описание категории', **NULLABLE)
+    image = models.ImageField(upload_to='categories/', verbose_name='Изображение категории', **NULLABLE)
+    order = models.PositiveIntegerField(default=0, verbose_name='Порядок сортировки')
+    is_active = models.BooleanField(default=True, verbose_name='Активна')
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        db_table = 'catalog_categories'
+        verbose_name = 'Категория'
+        verbose_name_plural = 'Категории'
+        ordering = ['order', 'name']
+
+    def __str__(self):
+        """Иерархическое название категории"""
+        if self.parent:
+            return f'{self.parent.name} → {self.name}'
+        return self.name
+
+    def get_absolute_url(self):
+        """URL для просмотра категории"""
+        return reverse('catalog:category_detail', kwargs={'slug': self.slug})

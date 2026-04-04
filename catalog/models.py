@@ -65,3 +65,21 @@ class Category(models.Model):
     def get_absolute_url(self):
         """URL для просмотра категории"""
         return reverse('catalog:category_detail', kwargs={'slug': self.slug})
+
+
+class SkinType(models.Model):
+    """Тип кожи"""
+    name = models.CharField(max_length=50, verbose_name='Тип кожи')
+    slug = models.SlugField(unique=True, verbose_name='URL-метка', **NULLABLE)
+    description = models.TextField(verbose_name='Описание типа кожи', **NULLABLE)
+    icon = models.CharField(max_length=50, verbose_name='Иконка', **NULLABLE)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        db_table = 'catalog_skin_types'
+        verbose_name = 'Тип кожи'
+        verbose_name_plural = 'Типы кожи'
+        ordering = ['id']
+
+    def __str__(self):
+        return self.name

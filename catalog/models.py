@@ -1,41 +1,9 @@
 from django.db import models
 from django.core.validators import MinValueValidator
 from django.urls import reverse
+from django.conf import settings
 
 from users.models import NULLABLE
-
-
-class Product(models.Model):
-    """Модель товара"""
-    name = models.CharField(max_length=200, verbose_name='Название')
-    description = models.TextField(verbose_name='Описание')
-    price = models.DecimalField(max_digits=10, decimal_places=2, verbose_name='Цена')
-    stock = models.PositiveIntegerField(default=0, validators=[MinValueValidator(0)], verbose_name='Остаток')
-    image = models.ImageField(upload_to='catalog/', verbose_name='Изображение', **NULLABLE)
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-
-    class Meta:
-        db_table = 'catalog_products'
-        verbose_name = 'Товар'
-        verbose_name_plural = 'Товары'
-        ordering = ['-created_at'] # сортировка от новых к старым
-
-    def __str__(self):
-        return self.name
-
-    @property
-    def is_available(self):
-        """Проверка на доступность товара для заказа"""
-        return self.stock > 0
-
-    def decrease_stock(self, quantity):
-        """Уменьшение товара на складе при оформлении заказа"""
-        if self.stock >= quantity:
-            self.stock -= quantity
-            self.save()
-            return True
-        return False
 
 
 class Category(models.Model):
@@ -106,3 +74,59 @@ class Ingredient(models.Model):
 
     def __str__(self):
         return self.name
+
+
+class Product(models.Model):
+    """Модель товара"""
+    name = models.CharField(max_length=200, verbose_name='Название')
+    description = models.TextField(verbose_name='Описание')
+    price = models.DecimalField(max_digits=10, decimal_places=2, verbose_name='Цена')
+    stock = models.PositiveIntegerField(default=0, validators=[MinValueValidator(0)], verbose_name='Остаток')
+    image = models.ImageField(upload_to='catalog/', verbose_name='Изображение', **NULLABLE)
+    category = models.ForeignKey(Category, on_delete=models.SET_NULL, **NULLABLE, related_name='products', verbose_name='Категория')
+    skin_types = models.ManyToManyField(SkinType, related_name='products', verbose_name='Подходит для типа кожи', **NULLABLE)
+    ingredients = models.ManyToManyField(Ingredient, related_name='products', verbose_name='Ингредиенты в составе', **NULLABLE)
+    sku = models.CharField(max_length=200, unique=True, verbose_name='Артикул', **NULLABLE)
+    volume = models.CharField(max_length=50, verbose_name='Объём/Вес', **NULLABLE)
+    is_active = models.BooleanField(default=True, verbose_name='Активен')
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        db_table = 'catalog_products'
+        verbose_name = 'Товар'
+        verbose_name_plural = 'Товары'
+        ordering = ['-created_at'] # сортировка от новых к старым
+
+    def __str__(self):
+        return self.name
+
+    @property
+    def is_available(self):
+        """Проверка на доступность товара для заказа"""
+        return self.stock > 0
+
+    def decrease_stock(self, quantity):
+        """Уменьшение товара на складе при оформлении заказа"""
+        if self.stock >= quantity:
+            self.stock -= quantity
+            self.save()
+            return True
+        return False
+
+class Favorite(models.Model):
+    """Избранные товары пользователя"""
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='favorites', verbose_name='Пользователь')
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='favorited_by', verbose_name='Товар')
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name='Дата добавления')
+
+    class Meta:
+        db_table = 'catalog_favorites'
+        verbose_name = 'Избранное'
+        verbose_name_plural = 'Избранные товары'
+        ordering = ['-created_at']
+        unique_together = ('user', 'product') # один пользователь может добавить в избранное товар только один раз
+
+    def __str__(self):
+        return f'{self.user.email} - {self.product.name}'
+

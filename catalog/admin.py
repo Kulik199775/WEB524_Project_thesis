@@ -81,7 +81,7 @@ class SkinTypeAdmin(admin.ModelAdmin):
             'fields': ('name', 'slug', 'description')
         }),
         ('Оформление', {
-            'fields': ('icon', 'icon_display_preview'),
+            'fields': ('icon',),
             'classes': ('collapse',)
         }),
         ('Статистика', {
@@ -110,13 +110,6 @@ class SkinTypeAdmin(admin.ModelAdmin):
             return format_html('<i class="{}" style="font-size: 20px;"></i>', obj.icon)
         return '-'
     icon_display.short_description = 'Иконка'
-
-    def icon_display_preview(self, obj):
-        """Представление иконки в детальной странице"""
-        if obj.icon:
-            return format_html('<i class="{}" style="font-size: 40px;"></i><br>Класс: {}', obj.icon, obj.icon)
-        return 'Иконка не задана'
-    icon_display_preview.short_description = 'Превью иконки'
 
 
 @admin.register(Ingredient)
@@ -223,43 +216,48 @@ class ProductAdmin(admin.ModelAdmin):
             'classes': ('collapse',)
         }),
         ('Дополнительно', {
-            'fields': ('is_active', 'is_new', 'is_bestseller', 'created_at', 'updated_at'),
+            'fields': ('is_active', 'created_at', 'updated_at'),
             'classes': ('collapse',)
         })
     )
+
     filter_horizontal = ('skin_types', 'ingredients')
     inlines = []
 
     def is_available(self, obj):
         """Отображение доступности товара"""
+        if not obj or not obj.pk:  # Проверка на новый объект
+            return '-'
         if obj.is_available:
             return format_html('<span style="color: green; font-weight: bold;">✓ В наличии</span>')
         return format_html('<span style="color: red; font-weight: bold;">✗ Нет в наличии</span>')
-
     is_available.short_description = 'Доступность'
     is_available.admin_order_field = 'stock'
 
     def stock_status(self, obj):
         """Статус остатка с цветовой индикацией"""
+        if not obj or not obj.pk:
+            return '-'
+
+        if obj.stock is None:
+            return format_html('<span style="color: gray;">⚫ Не указано</span>')
+
         if obj.stock > 50:
             return format_html('<span style="color: green;">🟢 Много ({} шт.)</span>', obj.stock)
         elif obj.stock > 10:
             return format_html('<span style="color: orange;">🟡 Средне ({} шт.)</span>', obj.stock)
         elif obj.stock > 0:
             return format_html('<span style="color: red;">🔴 Мало ({} шт.)</span>', obj.stock)
-        return format_html('<span style="color: gray;">⚫ Нет в наличии</span>')
+        elif obj.stock == 0:
+            return format_html('<span style="color: gray;">⚫ Нет в наличии</span>')
+        else:
+            return format_html('<span style="color: red;">❌ Ошибка: отрицательный остаток</span>')
 
     stock_status.short_description = 'Состояние склада'
 
     def tags_display(self, obj):
         """Отображение тегов/меток товара"""
         tags = []
-        if obj.is_new:
-            tags.append(
-                '<span style="background: #28a745; color: white; padding: 2px 6px; border-radius: 3px;">🆕 Новинка</span>')
-        if obj.is_bestseller:
-            tags.append(
-                '<span style="background: #ffc107; color: black; padding: 2px 6px; border-radius: 3px;">⭐ Хит</span>')
         if not obj.is_available:
             tags.append(
                 '<span style="background: #dc3545; color: white; padding: 2px 6px; border-radius: 3px;">📦 Нет в наличии</span>')
@@ -269,21 +267,20 @@ class ProductAdmin(admin.ModelAdmin):
 
     def image_preview(self, obj):
         """Превью изображения в списке"""
+        if not obj or not obj.pk:  # Проверка на новый объект
+            return '-'
         if obj.image:
-            return format_html(
-                '<img src="{}" style="width: 50px; height: 50px; object-fit: cover; border-radius: 5px;" />',
-                obj.image.url)
+            return format_html('<img src="{}" style="width: 50px; height: 50px; object-fit: cover; border-radius: 5px;" />', obj.image.url)
         return format_html('<span style="color: gray;">📷 Нет фото</span>')
-
     image_preview.short_description = 'Фото'
 
     def image_preview_large(self, obj):
         """Крупное превью для детальной страницы"""
+        if not obj or not obj.pk:  # Проверка на новый объект
+            return 'Изображение появится после сохранения'
         if obj.image:
-            return format_html('<img src="{}" style="width: 200px; height: auto; border-radius: 10px;" />',
-                               obj.image.url)
+            return format_html('<img src="{}" style="width: 200px; height: auto; border-radius: 10px;" />', obj.image.url)
         return 'Нет изображения'
-
     image_preview_large.short_description = 'Превью'
 
     actions = ['mark_available', 'mark_unavailable', 'increase_price', 'decrease_price']
@@ -338,15 +335,17 @@ class FavoriteAdmin(admin.ModelAdmin):
 
     fieldsets = (
         ('Информация о пользователе', {
-            'fields': ('user', 'user_full_info')
+            'fields': ('user',)
         }),
         ('Информация о товаре', {
-            'fields': ('product', 'product_full_info')
+            'fields': ('product',)
         }),
         ('Дата', {
-            'fields': ('created_at', 'days_ago')
+            'fields': ('created_at',)
         })
     )
+
+    readonly_fields = ('created_at',)
 
     def user_info(self, obj):
         """Отображение информации о пользователе"""
@@ -366,29 +365,6 @@ class FavoriteAdmin(admin.ModelAdmin):
         )
 
     product_info.short_description = 'Товар'
-
-    def user_full_info(self, obj):
-        """Полная информация о пользователе (только для чтения)"""
-        return format_html(
-            '<b>Email:</b> {}<br><b>Имя:</b> {}<br><b>Телефон:</b> {}',
-            obj.user.email,
-            obj.user.get_full_name() or '-',
-            obj.user.phone or '-'
-        )
-
-    user_full_info.short_description = 'Детали пользователя'
-
-    def product_full_info(self, obj):
-        """Полная информация о товаре (только для чтения)"""
-        return format_html(
-            '<b>Название:</b> {}<br><b>Цена:</b> ₽ {}<br><b>Категория:</b> {}<br><b>В наличии:</b> {}',
-            obj.product.name,
-            obj.product.price,
-            obj.product.category or '-',
-            'Да' if obj.product.is_available else 'Нет'
-        )
-
-    product_full_info.short_description = 'Детали товара'
 
     def days_ago(self, obj):
         """Сколько дней назад добавлено в избранное"""

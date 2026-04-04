@@ -177,13 +177,13 @@ class IngredientAdmin(admin.ModelAdmin):
 @admin.register(Product)
 class ProductAdmin(admin.ModelAdmin):
     """Для управления товарами"""
-    list_display = ('name', 'price', 'stock', 'is_available', 'category', 'tags_display', 'image_preview')
+    list_display = ('name', 'price', 'stock', 'is_available', 'category')
     list_display_links = ('name',)
     list_filter = ('category', 'skin_types', 'ingredients', 'is_active', 'created_at')
     search_fields = ('name', 'description', 'sku')
     list_editable = ('price', 'stock')
     list_per_page = 20
-    readonly_fields = ('created_at', 'updated_at', 'image_preview_large', 'stock_status')
+    readonly_fields = ('created_at', 'updated_at')
 
     date_hierarchy = 'created_at'
 
@@ -192,7 +192,7 @@ class ProductAdmin(admin.ModelAdmin):
             'fields': ('name', 'description', 'sku', 'category')
         }),
         ('Цены и остатки', {
-            'fields': ('price', 'stock', 'stock_status', 'volume'),
+            'fields': ('price', 'stock', 'volume'),
             'classes': ('wide',)
         }),
         ('Характеристики', {
@@ -200,7 +200,7 @@ class ProductAdmin(admin.ModelAdmin):
             'classes': ('wide',)
         }),
         ('Изображение', {
-            'fields': ('image', 'image_preview_large'),
+            'fields': ('image',),
             'classes': ('collapse',)
         }),
         ('Дополнительно', {
@@ -210,89 +210,35 @@ class ProductAdmin(admin.ModelAdmin):
     )
 
     filter_horizontal = ('skin_types', 'ingredients')
-    inlines = []
 
     def is_available(self, obj):
         """Отображение доступности товара"""
-        if not obj or not obj.pk:  # Проверка на новый объект
-            return '-'
-        if obj.is_available:
-            return format_html('<span style="color: green; font-weight: bold;">✓ В наличии</span>')
-        return format_html('<span style="color: red; font-weight: bold;">✗ Нет в наличии</span>')
+        try:
+            if not obj or not obj.pk:
+                return '-'
+            if obj.is_available:
+                return mark_safe('<span style="color: green; font-weight: bold;">✓ В наличии</span>')
+            else:
+                return mark_safe('<span style="color: red; font-weight: bold;">✗ Нет в наличии</span>')
+        except:
+            return mark_safe('<span style="color: gray;">-</span>')
     is_available.short_description = 'Доступность'
     is_available.admin_order_field = 'stock'
 
-    def stock_status(self, obj):
-        """Статус остатка с цветовой индикацией"""
-        if not obj or not obj.pk:
-            return '-'
-
-        if obj.stock is None:
-            return format_html('<span style="color: gray;">⚫ Не указано</span>')
-
-        if obj.stock > 50:
-            return format_html('<span style="color: green;">🟢 Много ({} шт.)</span>', obj.stock)
-        elif obj.stock > 10:
-            return format_html('<span style="color: orange;">🟡 Средне ({} шт.)</span>', obj.stock)
-        elif obj.stock > 0:
-            return format_html('<span style="color: red;">🔴 Мало ({} шт.)</span>', obj.stock)
-        elif obj.stock == 0:
-            return format_html('<span style="color: gray;">⚫ Нет в наличии</span>')
-        else:
-            return format_html('<span style="color: red;">❌ Ошибка: отрицательный остаток</span>')
-
-    stock_status.short_description = 'Состояние склада'
-
-    def tags_display(self, obj):
-        """Отображение тегов/меток товара"""
-        tags = []
-        if not obj.is_available:
-            tags.append(
-                '<span style="background: #dc3545; color: white; padding: 2px 6px; border-radius: 3px;">📦 Нет в наличии</span>'
-            )
-        if tags:
-            return format_html(' '.join(tags))
-        return '-'
-
-    tags_display.short_description = 'Метки'
-
-    def image_preview(self, obj):
-        """Представление изображения в списке"""
-        if obj and obj.image:
-            return format_html(
-                '<img src="{}" style="width: 50px; height: 50px; object-fit: cover;" />',
-                obj.image.url
-            )
-        return format_html('{}', '<span style="color: gray;">Нет фото</span>')
-
-    image_preview.short_description = 'Превью'
-
-    def image_preview_large(self, obj):
-        """Крупное превью для детальной страницы"""
-        if not obj or not obj.pk:  # Проверка на новый объект
-            return 'Изображение появится после сохранения'
-        if obj.image:
-            return format_html('<img src="{}" style="width: 200px; height: auto; border-radius: 10px;" />', obj.image.url)
-        return 'Нет изображения'
-    image_preview_large.short_description = 'Превью'
-
-    actions = ['mark_available', 'mark_unavailable', 'increase_price', 'decrease_price']
+    actions = ['make_available', 'make_unavailable', 'increase_price_10', 'decrease_price_10']
 
     @admin.action(description='Отметить выбранные товары как в наличии')
     def make_available(self, request, queryset):
-        """Отметить товары как доступные"""
         count = queryset.filter(stock__gt=0).count()
         self.message_user(request, f'{count} товаров уже в наличии.')
 
     @admin.action(description='Установить остаток в 0 для выбранных товаров')
     def make_unavailable(self, request, queryset):
-        """Установить остаток в 0 для выбранных товаров"""
         updated = queryset.update(stock=0)
         self.message_user(request, f'{updated} товаров отмечены как распроданные.')
 
     @admin.action(description='Увеличить цену на 10 процентов')
     def increase_price_10(self, request, queryset):
-        """Увеличение цены на 10%"""
         for product in queryset:
             product.price = product.price * Decimal('1.1')
             product.save()
@@ -300,7 +246,6 @@ class ProductAdmin(admin.ModelAdmin):
 
     @admin.action(description='Уменьшить цену на 10 процентов')
     def decrease_price_10(self, request, queryset):
-        """Уменьшение цены на 10%"""
         for product in queryset:
             product.price = product.price * Decimal('0.9')
             product.save()

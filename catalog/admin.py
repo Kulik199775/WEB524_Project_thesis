@@ -1,6 +1,8 @@
 from django.contrib import admin
 from django.utils.html import format_html
 from django.db.models import Count
+from django.utils.safestring import mark_safe
+
 from .models import Category, SkinType, Ingredient, Product, Favorite
 
 from decimal import Decimal
@@ -34,21 +36,30 @@ class CategoryAdmin(admin.ModelAdmin):
 
     def products_count(self, obj):
         """Подсчет количества товаров в категории"""
-        count = obj.products.count()
-        return format_html('<span style="font-weight: bold;">{}</span>', count)
+        try:
+            count = obj.products.count()
+            return mark_safe(f'<span style="font-weight: bold;">{count}</span>')
+        except:
+            return '0'
     products_count.short_description = 'Товаров'
 
     def image_preview(self, obj):
         """Представление изображения в списке"""
-        if obj.image:
-            return format_html('<img src="{}" style="width: 50px; height: 50px; object-fit: cover;" />', obj.image.url)
-        return format_html('<span style="color: gray;">Нет фото</span>')
+        try:
+            if obj and obj.image and obj.image.url:
+                return mark_safe(f'<img src="{obj.image.url}" style="width: 50px; height: 50px; object-fit: cover;" />')
+        except:
+            pass
+        return mark_safe('<span style="color: gray;">Нет фото</span>')  # ← Исправлено
     image_preview.short_description = 'Превью'
 
     def image_preview_large(self, obj):
         """Крупное представление для детальной информации"""
-        if obj.image:
-            return format_html('<img src="{}" style="width: 200px; height: auto;" />', obj.image.url)
+        try:
+            if obj and obj.image and obj.image.url:
+                return mark_safe(f'<img src="{obj.image.url}" style="width: 200px; height: auto;" />')
+        except:
+            pass
         return 'Нет изображения'
     image_preview_large.short_description = 'Изображение'
 
@@ -56,13 +67,11 @@ class CategoryAdmin(admin.ModelAdmin):
 
     @admin.action(description='Активировать выбранные категории')
     def activate_categories(self, request, queryset):
-        """Активация выбранных категорий"""
         updated = queryset.update(is_active=True)
         self.message_user(request, f'Активировано {updated} категорий.')
 
     @admin.action(description='Деактивировать выбранные категории')
     def deactivate_categories(self, request, queryset):
-        """Деактивация выбранных категорий"""
         updated = queryset.update(is_active=False)
         self.message_user(request, f'Деактивировано {updated} категорий.')
 
@@ -98,11 +107,13 @@ class SkinTypeAdmin(admin.ModelAdmin):
 
     def products_list(self, obj):
         """Список товаров для детальной страницы"""
+        if not obj or not obj.pk:
+            return 'Нет товаров'
         products = obj.products.all()[:10]
         if products:
-            return format_html('<br>'.join([f'• {p.name}' for p in products]))
+            items = [f'• {p.name}' for p in products]
+            return format_html('<br>'.join(items))
         return 'Нет товаров'
-    products_list.short_description = 'Товары с этим типом кожи'
 
     def icon_display(self, obj):
         """Отображение иконки в списке"""
@@ -148,6 +159,8 @@ class IngredientAdmin(admin.ModelAdmin):
 
     def products_list(self, obj):
         """Список товаров содержащих ингредиент"""
+        if not obj or not obj.pk:
+            return 'Нет товаров'
         products = obj.products.all()[:15]
         if products:
             return format_html('<br>'.join([f'• {p.name}' for p in products]))
@@ -163,7 +176,11 @@ class IngredientAdmin(admin.ModelAdmin):
             badges.append('<span style="color: #28a745;">✅ Органический</span>')
         if obj.is_allergen:
             badges.append('<span style="color: red;">⚠️ Аллерген</span>')
-        return format_html('<br>'.join(badges) if badges else '-')
+
+        if badges:
+            return format_html('<br>'.join(badges))
+        return format_html('-')
+
     status_badge.short_description = 'Свойства'
 
     def image_preview_large(self, obj):
@@ -260,19 +277,24 @@ class ProductAdmin(admin.ModelAdmin):
         tags = []
         if not obj.is_available:
             tags.append(
-                '<span style="background: #dc3545; color: white; padding: 2px 6px; border-radius: 3px;">📦 Нет в наличии</span>')
-        return format_html(' '.join(tags)) if tags else '-'
+                '<span style="background: #dc3545; color: white; padding: 2px 6px; border-radius: 3px;">📦 Нет в наличии</span>'
+            )
+        if tags:
+            return format_html(' '.join(tags))
+        return '-'
 
     tags_display.short_description = 'Метки'
 
     def image_preview(self, obj):
-        """Превью изображения в списке"""
-        if not obj or not obj.pk:  # Проверка на новый объект
-            return '-'
-        if obj.image:
-            return format_html('<img src="{}" style="width: 50px; height: 50px; object-fit: cover; border-radius: 5px;" />', obj.image.url)
-        return format_html('<span style="color: gray;">📷 Нет фото</span>')
-    image_preview.short_description = 'Фото'
+        """Представление изображения в списке"""
+        if obj and obj.image:
+            return format_html(
+                '<img src="{}" style="width: 50px; height: 50px; object-fit: cover;" />',
+                obj.image.url
+            )
+        return format_html('{}', '<span style="color: gray;">Нет фото</span>')
+
+    image_preview.short_description = 'Превью'
 
     def image_preview_large(self, obj):
         """Крупное превью для детальной страницы"""
@@ -285,28 +307,28 @@ class ProductAdmin(admin.ModelAdmin):
 
     actions = ['mark_available', 'mark_unavailable', 'increase_price', 'decrease_price']
 
-    @admin.action(description='Отметить как в наличии (если остаток > 0)')
-    def mark_available(self, request, queryset):
-        """Отметить товары как доступные (ничего не меняет, просто уведомление)"""
+    @admin.action(description='Отметить выбранные товары как в наличии')
+    def make_available(self, request, queryset):
+        """Отметить товары как доступные"""
         count = queryset.filter(stock__gt=0).count()
-        self.message_user(request, f'{count} товаров уже в наличии или будут добавлены.')
+        self.message_user(request, f'{count} товаров уже в наличии.')
 
-    @admin.action(description='Отметить как распродано')
-    def mark_unavailable(self, request, queryset):
+    @admin.action(description='Установить остаток в 0 для выбранных товаров')
+    def make_unavailable(self, request, queryset):
         """Установить остаток в 0 для выбранных товаров"""
         updated = queryset.update(stock=0)
         self.message_user(request, f'{updated} товаров отмечены как распроданные.')
 
-    @admin.action(description='Увеличить цену на 10%')
-    def increase_price(self, request, queryset):
+    @admin.action(description='Увеличить цену на 10 процентов')
+    def increase_price_10(self, request, queryset):
         """Увеличение цены на 10%"""
         for product in queryset:
             product.price = product.price * Decimal('1.1')
             product.save()
         self.message_user(request, f'Цена увеличена для {queryset.count()} товаров.')
 
-    @admin.action(description='Уменьшить цену на 10%')
-    def decrease_price(self, request, queryset):
+    @admin.action(description='Уменьшить цену на 10 процентов')
+    def decrease_price_10(self, request, queryset):
         """Уменьшение цены на 10%"""
         for product in queryset:
             product.price = product.price * Decimal('0.9')
@@ -314,7 +336,6 @@ class ProductAdmin(admin.ModelAdmin):
         self.message_user(request, f'Цена уменьшена для {queryset.count()} товаров.')
 
     def save_model(self, request, obj, form, change):
-        """Переопределение сохранения для логирования"""
         if change:
             self.message_user(request, f'Товар "{obj.name}" успешно обновлен.', level='SUCCESS')
         else:
@@ -349,11 +370,9 @@ class FavoriteAdmin(admin.ModelAdmin):
 
     def user_info(self, obj):
         """Отображение информации о пользователе"""
-        return format_html(
-            '<strong>{}</strong><br><span style="color: gray;">{}</span>',
-            obj.user.email,
-            obj.user.get_full_name() or 'Не указано имя'
-        )
+        full_name = obj.user.get_full_name() or 'Не указано имя'
+        return format_html('<strong>{}</strong><br><span style="color: gray;">{}</span>',
+                           obj.user.email, full_name)
     user_info.short_description = 'Пользователь'
 
     def product_info(self, obj):

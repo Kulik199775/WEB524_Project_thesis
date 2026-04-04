@@ -126,12 +126,13 @@ class SkinTypeAdmin(admin.ModelAdmin):
 @admin.register(Ingredient)
 class IngredientAdmin(admin.ModelAdmin):
     """Управление ингредиентами"""
-    list_display = ('name', 'is_natural', 'is_organic', 'is_allergen', 'products_count', 'status_badge')
+    list_display = ('name', 'is_natural', 'is_organic', 'is_allergen', 'products_count')
     list_display_links = ('name',)
     list_filter = ('is_natural', 'is_organic', 'is_allergen')
     search_fields = ('name', 'scientific_name', 'description')
     list_per_page = 20
-    readonly_fields = ('created_at', 'updated_at', 'products_list', 'image_preview_large')
+    readonly_fields = ('created_at', 'updated_at')
+
     fieldsets = (
         ('Основная информация', {
             'fields': ('name', 'scientific_name', 'description', 'benefits')
@@ -141,63 +142,33 @@ class IngredientAdmin(admin.ModelAdmin):
             'classes': ('wide',)
         }),
         ('Визуальное оформление', {
-            'fields': ('image', 'image_preview_large'),
+            'fields': ('image',),
             'classes': ('collapse',)
         }),
-        ('Статистика', {
-            'fields': ('products_list', 'created_at', 'updated_at'),
+        ('Даты', {
+            'fields': ('created_at', 'updated_at'),
             'classes': ('collapse',)
         })
     )
 
     def products_count(self, obj):
         """Количества товаров с этим ингредиентом"""
-        count = obj.products.count()
-        color = '#2bde3f' if count > 10 else '#ffc107' if count > 0 else '#dc3545'
-        return format_html('<span style="color: {}; font-weight: bold;">{}</span>', color, count)
+        try:
+            count = obj.products.count()
+            color = '#2bde3f' if count > 10 else '#ffc107' if count > 0 else '#dc3545'
+            return mark_safe(f'<span style="color: {color}; font-weight: bold;">{count}</span>')
+        except:
+            return '0'
     products_count.short_description = 'Товаров'
-
-    def products_list(self, obj):
-        """Список товаров содержащих ингредиент"""
-        if not obj or not obj.pk:
-            return 'Нет товаров'
-        products = obj.products.all()[:15]
-        if products:
-            return format_html('<br>'.join([f'• {p.name}' for p in products]))
-        return 'Нет товаров с этим ингредиентом'
-    products_list.short_description = 'Товары в составе'
-
-    def status_badge(self, obj):
-        """Бейдж статуса ингредиента"""
-        badges = []
-        if obj.is_natural:
-            badges.append('<span style="color: green;">🌿 Натуральный</span>')
-        if obj.is_organic:
-            badges.append('<span style="color: #28a745;">✅ Органический</span>')
-        if obj.is_allergen:
-            badges.append('<span style="color: red;">⚠️ Аллерген</span>')
-
-        if badges:
-            return format_html('<br>'.join(badges))
-        return format_html('-')
-
-    status_badge.short_description = 'Свойства'
-
-    def image_preview_large(self, obj):
-        """Представление изображения"""
-        if obj.image:
-            return format_html('<img src="{}" style="width: 150px; height: auto;" />', obj.image.url)
-        return 'Нет изображения'
-    image_preview_large.short_description = 'Изображение'
 
     actions = ['mark_as_natural', 'mark_as_allergen']
 
-    @admin.action(description='Отметить как натуральные')
+    @admin.action(description='Отметить выбранные ингредиенты как натуральные')
     def mark_as_natural(self, request, queryset):
         queryset.update(is_natural=True)
         self.message_user(request, f'Отмечено {queryset.count()} ингредиентов как натуральные.')
 
-    @admin.action(description='Отметить как аллергены')
+    @admin.action(description='Отметить выбранные ингредиенты как аллергены')
     def mark_as_allergen(self, request, queryset):
         queryset.update(is_allergen=True)
         self.message_user(request, f'Отмечено {queryset.count()} ингредиентов как аллергены.')

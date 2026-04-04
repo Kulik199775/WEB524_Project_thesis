@@ -83,3 +83,26 @@ class SkinType(models.Model):
 
     def __str__(self):
         return self.name
+
+
+class Ingredient(models.Model):
+    """Ингредиенты"""
+    name = models.CharField(max_length=100, verbose_name='Название ингредиента')
+    scientific_name = models.CharField(max_length=200, verbose_name='Научное название', **NULLABLE)
+    description = models.TextField(verbose_name='Описание и свойства ингредиента', **NULLABLE)
+    benefits = models.TextField(verbose_name='Польза для кожи/волос', **NULLABLE)
+    is_natural = models.BooleanField(default=True, verbose_name='Натуральный компонент')
+    is_organic = models.BooleanField(default=False, verbose_name='Органический компонент')
+    is_allergen = models.BooleanField(default=False, verbose_name='Потенциальный аллерген')
+    image = models.ImageField(upload_to='ingredients/', verbose_name='Изображение', **NULLABLE)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        db_table = 'catalog_ingredients'
+        verbose_name = 'Ингредиент'
+        verbose_name_plural = 'Ингредиенты'
+        ordering = ['name']
+
+    def __str__(self):
+        return self.name

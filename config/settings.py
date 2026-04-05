@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     'users',
     'catalog',
     'common',
+    'cart',
 ]
 
 MIDDLEWARE = [
@@ -66,14 +67,17 @@ TEMPLATES = [
         "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [
+                'django.template.context_processors.debug',
                 "django.template.context_processors.request",
                 "django.contrib.auth.context_processors.auth",
                 "django.contrib.messages.context_processors.messages",
+                'cart.context_processors.cart',
             ],
         },
     },
 ]
 
+CART_SESSION_ID = 'cart'
 WSGI_APPLICATION = "config.wsgi.application"
 
 # Database
@@ -155,6 +159,7 @@ MEDIA_ROOT = (
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 AUTH_USER_MODEL = 'users.User'
+
 
 # LOGIN_REDIRECT_URL = "dogs:index"
 # LOGOUT_REDIRECT_URL = "dogs:index"

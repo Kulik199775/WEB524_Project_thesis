@@ -1,0 +1,82 @@
+{% extends 'base.html' %}
+
+{% block title %}Мой профиль{% endblock %}
+
+{% block content %}
+<div class="container my-4">
+    <div class="row">
+        <div class="col-md-4">
+            <div class="card shadow">
+                <div class="card-body text-center">
+                    {% if profile_user.avatar %}
+                        <img src="{{ profile_user.avatar.url }}" alt="Аватар" class="rounded-circle img-fluid mb-3" style="width: 150px; height: 150px; object-fit: cover;">
+                    {% else %}
+                        <div class="bg-secondary text-white rounded-circle d-flex align-items-center justify-content-center mx-auto mb-3" style="width: 150px; height: 150px;">
+                            <i class="bi bi-person" style="font-size: 4rem;"></i>
+                        </div>
+                    {% endif %}
+                    
+                    <h4>{{ profile_user.get_full_name|default:profile_user.email }}</h4>
+                    <p class="text-muted">{{ profile_user.email }}</p>
+                    
+                    {% if profile_user.is_admin %}
+                        <span class="badge bg-danger">Администратор</span>
+                    {% elif profile_user.is_moderator %}
+                        <span class="badge bg-warning">Модератор</span>
+                    {% else %}
+                        <span class="badge bg-secondary">Пользователь</span>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-8">
+            <div class="card shadow">
+                <div class="card-header bg-success text-white d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">Информация о профиле</h5>
+                    <a href="{% url 'users:profile_edit' %}" class="btn btn-sm btn-light">
+                        <i class="bi bi-pencil"></i> Редактировать
+                    </a>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-3">
+                        <div class="col-md-4 fw-bold">Имя:</div>
+                        <div class="col-md-8">{{ profile_user.first_name|default:"Не указано" }}</div>
+                    </div>
+                    
+                    <div class="row mb-3">
+                        <div class="col-md-4 fw-bold">Фамилия:</div>
+                        <div class="col-md-8">{{ profile_user.last_name|default:"Не указано" }}</div>
+                    </div>
+                    
+                    <div class="row mb-3">
+                        <div class="col-md-4 fw-bold">Телефон:</div>
+                        <div class="col-md-8">{{ profile_user.phone|default:"Не указан" }}</div>
+                    </div>
+                    
+                    <div class="row mb-3">
+                        <div class="col-md-4 fw-bold">Адрес доставки:</div>
+                        <div class="col-md-8">{{ profile_user.address|default:"Не указан"|linebreaks }}</div>
+                    </div>
+                    
+                    <div class="row mb-3">
+                        <div class="col-md-4 fw-bold">Дата регистрации:</div>
+                        <div class="col-md-8">{{ profile_user.created_at|date:"d.m.Y H:i" }}</div>
+                    </div>
+                    
+                    <hr>
+                    
+                    <div class="d-grid gap-2">
+                        <a href="{% url 'users:password_change' %}" class="btn btn-outline-primary">
+                            <i class="bi bi-key"></i> Сменить пароль
+                        </a>
+                        <a href="{% url 'reviews:my_reviews' %}" class="btn btn-outline-info">
+                            <i class="bi bi-chat"></i> Мои отзывы
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

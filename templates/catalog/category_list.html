@@ -1,0 +1,55 @@
+{% extends 'base.html' %}
+
+{% block title %}Категории товаров{% endblock %}
+
+{% block content %}
+<div class="container my-4">
+    <h1 class="mb-4">Категории косметики</h1>
+    
+    <div class="row">
+        {% for category in categories %}
+        <div class="col-md-4 mb-4">
+            <div class="card h-100 shadow-sm">
+                {% if category.image %}
+                    <img src="{{ category.image.url }}" class="card-img-top" alt="{{ category.name }}" style="height: 200px; object-fit: cover;">
+                {% else %}
+                    <div class="bg-success text-white text-center py-5">
+                        <i class="bi bi-tags" style="font-size: 3rem;"></i>
+                    </div>
+                {% endif %}
+                
+                <div class="card-body">
+                    <h5 class="card-title">{{ category.name }}</h5>
+                    {% if category.description %}
+                        <p class="card-text text-muted">{{ category.description|truncatewords:20 }}</p>
+                    {% endif %}
+                    
+                    {% if category.children.exists %}
+                        <small class="text-muted">
+                            <i class="bi bi-folder"></i> Подкатегории: 
+                            {% for child in category.children.all|slice:":3" %}
+                                {{ child.name }}{% if not forloop.last %}, {% endif %}
+                            {% endfor %}
+                            {% if category.children.count > 3 %} и др.{% endif %}
+                        </small>
+                    {% endif %}
+                </div>
+                
+                <div class="card-footer bg-white">
+                    <a href="{% url 'catalog:category_detail' slug=category.slug %}" class="btn btn-success w-100">
+                        <i class="bi bi-eye"></i> Смотреть товары
+                    </a>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="col-12 text-center py-5">
+            <h3>Категории не найдены</h3>
+        </div>
+        {% endfor %}
+    </div>
+    
+    <!-- Пагинация -->
+    {% include 'includes/pagination.html' %}
+</div>
+{% endblock %}

@@ -1,0 +1,59 @@
+{% extends 'base.html' %}
+
+{% block title %}Избранные товары{% endblock %}
+
+{% block content %}
+<div class="container my-4">
+    <h1 class="mb-4">Мои избранные товары</h1>
+    
+    <div class="row">
+        {% for favorite in favorites %}
+        <div class="col-md-4 mb-4">
+            <div class="card h-100 shadow-sm">
+                {% if favorite.product.image %}
+                    <img src="{{ favorite.product.image.url }}" class="card-img-top" alt="{{ favorite.product.name }}" style="height: 200px; object-fit: cover;">
+                {% else %}
+                    <div class="bg-secondary text-white text-center py-5">Нет фото</div>
+                {% endif %}
+                
+                <div class="card-body">
+                    <h5 class="card-title">{{ favorite.product.name }}</h5>
+                    <p class="card-text text-muted small">{{ favorite.product.description|truncatewords:15 }}</p>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span class="h5 text-success">{{ favorite.product.price }} ₽</span>
+                        {% if favorite.product.is_available %}
+                            <span class="badge bg-success">В наличии</span>
+                        {% else %}
+                            <span class="badge bg-danger">Нет в наличии</span>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <div class="card-footer bg-white">
+                    <div class="btn-group w-100">
+                        <a href="{% url 'catalog:product_detail' pk=favorite.product.pk %}" class="btn btn-outline-primary btn-sm">
+                            <i class="bi bi-eye"></i> Подробнее
+                        </a>
+                        <form method="post" action="{% url 'catalog:remove_from_favorite' pk=favorite.product.pk %}" class="d-inline">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-outline-danger btn-sm">
+                                <i class="bi bi-trash"></i> Удалить
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="col-12 text-center py-5">
+            <i class="bi bi-heart" style="font-size: 4rem;"></i>
+            <h3>У вас пока нет избранных товаров</h3>
+            <a href="{% url 'catalog:home' %}" class="btn btn-success mt-3">Перейти в каталог</a>
+        </div>
+        {% endfor %}
+    </div>
+    
+    <!-- Пагинация -->
+    {% include 'includes/pagination.html' %}
+</div>
+{% endblock %}

@@ -9,6 +9,8 @@ from common.mixins import AdminRequiredMixin
 from .models import Product, Category, SkinType, Favorite
 from .forms import ProductForm
 
+from cart.cart import Cart
+
 
 class ProductListView(ListView):
     """Список товаров с пагинацией"""
@@ -23,9 +25,11 @@ class ProductListView(ListView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        context['cart'] = Cart(self.request)
         context['categories'] = Category.objects.filter(is_active=True, parent__isnull=True)
         context['skin_types'] = SkinType.objects.all()
         context['title'] = 'Каталог натуральной косметики'
+
         return context
 
 
@@ -78,8 +82,16 @@ class ProductDetailView(DetailView):
                 user=self.request.user,
                 product=self.object
             ).exists()
+
+            # Проверяем, оставлял ли пользователь отзыв
+            from reviews.models import Review
+            context['user_reviewed'] = Review.objects.filter(
+                user=self.request.user,
+                product=self.object
+            ).exists()
         else:
             context['is_favorite'] = False
+            context['user_reviewed'] = False
 
         # Похожие товары
         context['related_products'] = Product.objects.filter(

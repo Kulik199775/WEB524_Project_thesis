@@ -114,6 +114,19 @@ class Product(models.Model):
             return True
         return False
 
+    @property
+    def average_rating(self):
+        """Средний рейтинг товара"""
+        reviews = self.reviews.filter(is_approved=True)
+        if reviews.exists():
+            return round(reviews.aggregate(models.Avg('rating'))['rating__avg'], 1)
+        return 0
+
+    @property
+    def reviews_count(self):
+        """Количество отзывов"""
+        return self.reviews.filter(is_approved=True).count()
+
 class Favorite(models.Model):
     """Избранные товары пользователя"""
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='favorites', verbose_name='Пользователь')

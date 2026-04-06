@@ -1,6 +1,6 @@
 import json
 from django.views.generic import View, TemplateView
-from django.shortcuts import redirect, get_object_or_404
+from django.shortcuts import redirect, get_object_or_404, reverse
 from django.http import JsonResponse
 from django.contrib import messages
 from django.views.decorators.csrf import csrf_exempt
@@ -56,7 +56,7 @@ class CartAddView(View):
                 })
             messages.error(request, f'Недостаточно товара "{product.name}" на складе')
 
-        return redirect('catalog:product_detail', pk=product_id)
+        return redirect(request.META.get('HTTP_REFERER', reverse('catalog:product_list')))
 
 
 class CartDetailView(TemplateView):

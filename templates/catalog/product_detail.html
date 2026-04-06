@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load static %}
 
 {% block title %}{{ product.name }}{% endblock %}
 
@@ -13,7 +14,7 @@
             <li class="breadcrumb-item active">{{ product.name }}</li>
         </ol>
     </nav>
-    
+
     <div class="row">
         <div class="col-md-6">
             {% if product.image %}
@@ -25,10 +26,10 @@
                 </div>
             {% endif %}
         </div>
-        
+
         <div class="col-md-6">
             <h1>{{ product.name }}</h1>
-            
+
             <div class="mb-3">
                 <span class="h2 text-success">{{ product.price }} ₽</span>
                 {% if product.is_available %}
@@ -37,20 +38,60 @@
                     <span class="badge bg-danger ms-2">Нет в наличии</span>
                 {% endif %}
             </div>
-            
+
             {% if product.sku %}
                 <p class="text-muted">Артикул: {{ product.sku }}</p>
             {% endif %}
-            
+
             {% if product.volume %}
                 <p class="text-muted">Объём/Вес: {{ product.volume }}</p>
             {% endif %}
-            
+
             <div class="mb-4">
-                <h5>Описание:</h5>
-                <p>{{ product.description }}</p>
+                <ul class="nav nav-tabs" id="productTabs" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#description" type="button" role="tab">
+                            <i class="bi bi-file-text"></i> Описание
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" data-bs-toggle="tab" data-bs-target="#ingredients" type="button" role="tab">
+                            <i class="bi bi-flower1"></i> Состав
+                        </button>
+                    </li>
+                </ul>
+                <div class="tab-content p-3 border border-top-0 rounded-bottom">
+                    <div class="tab-pane fade show active" id="description" role="tabpanel">
+                        {{ product.description|linebreaks }}
+                    </div>
+                    <div class="tab-pane fade" id="ingredients" role="tabpanel">
+                        <ul class="list-unstyled">
+                            {% for ingredient in product.ingredients.all %}
+                                <li><i class="bi bi-flower1 text-success me-2"></i> {{ ingredient.name }}</li>
+                            {% empty %}
+                                <li class="text-muted">Состав не указан</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                    <div class="tab-pane fade" id="benefits" role="tabpanel">
+                        <ul class="list-unstyled">
+                            {% if product.benefits %}
+                                {{ product.benefits|linebreaks }}
+                            {% else %}
+                                <li><i class="bi bi-check-circle-fill text-success me-2"></i> Увлажняет и питает кожу</li>
+                                <li><i class="bi bi-check-circle-fill text-success me-2"></i> Подходит для ежедневного использования</li>
+                                <li><i class="bi bi-check-circle-fill text-success me-2"></i> Натуральные ингредиенты</li>
+                                <li><i class="bi bi-check-circle-fill text-success me-2"></i> Не содержит парабенов</li>
+                                <li><i class="bi bi-check-circle-fill text-success me-2"></i> Гипоаллергенно</li>
+                            {% endif %}
+                        </ul>
+                    </div>
+                    <div class="tab-pane fade" id="usage" role="tabpanel">
+                        <p>Нанесите небольшое количество на чистую кожу лица легкими массирующими движениями.</p>
+                    </div>
+                </div>
             </div>
-            
+
             {% if product.skin_types.exists %}
                 <div class="mb-3">
                     <h5><i class="bi bi-droplet"></i> Подходит для типа кожи:</h5>
@@ -59,18 +100,25 @@
                     {% endfor %}
                 </div>
             {% endif %}
-            
+
             <div class="d-grid gap-2">
                 {% if product.is_available %}
-                    <button class="btn btn-success btn-lg add-to-cart" data-product-id="{{ product.id }}">
-                        <i class="bi bi-cart-plus"></i> Добавить в корзину
-                    </button>
+                    <form method="post" action="{% url 'cart:add' product.id %}">
+                        {% csrf_token %}
+                        <div class="mb-2">
+                            <label for="quantity">Количество:</label>
+                            <input type="number" name="quantity" id="quantity" value="1" min="1" max="{{ product.stock }}" class="form-control" style="width: 100px;">
+                        </div>
+                        <button type="submit" class="btn btn-success btn-lg w-100">
+                            <i class="bi bi-cart-plus"></i> Добавить в корзину
+                        </button>
+                    </form>
                 {% else %}
                     <button class="btn btn-secondary btn-lg" disabled>
                         <i class="bi bi-cart-x"></i> Нет в наличии
                     </button>
                 {% endif %}
-                
+
                 <form method="post" action="
                     {% if is_favorite %}
                         {% url 'catalog:remove_from_favorite' pk=product.pk %}
@@ -85,25 +133,97 @@
                     </button>
                 </form>
             </div>
+
+            <!-- ============ Кнопки отзывов ============ -->
+            <div class="mt-4 p-3 bg-light rounded">
+                <h5><i class="bi bi-chat-dots"></i> Отзывы о товаре</h5>
+
+                {% if user.is_authenticated %}
+                    <!-- Проверяем, оставлял ли пользователь уже отзыв -->
+                    {% with user_review=product.reviews.filter|first %}
+                        {% if user_review %}
+                            <div class="alert alert-info">
+                                <i class="bi bi-info-circle"></i> Вы уже оставили отзыв на этот товар
+                                <a href="{% url 'reviews:product_reviews' product.pk %}" class="alert-link">Посмотреть все отзывы</a>
+                            </div>
+                        {% else %}
+                            <a href="{% url 'reviews:create' product.pk %}" class="btn btn-success w-100 mb-2">
+                                <i class="bi bi-pencil-square"></i> Написать отзыв
+                            </a>
+                        {% endif %}
+                    {% endwith %}
+                {% else %}
+                    <div class="alert alert-warning">
+                        <i class="bi bi-lock"></i>
+                        <a href="{% url 'users:login' %}" class="alert-link">Войдите</a>, чтобы оставить отзыв
+                    </div>
+                {% endif %}
+
+                <a href="{% url 'reviews:product_reviews' product.pk %}" class="btn btn-outline-primary w-100">
+                    <i class="bi bi-eye"></i> Смотреть все отзывы ({{ product.reviews.filter|length }})
+                </a>
+            </div>
         </div>
     </div>
-    
+
+    <!-- Последние отзывы -->
+    {% with approved_reviews=product.reviews.filter %}
+        {% if approved_reviews %}
+        <div class="row mt-5">
+            <div class="col-12">
+                <h3>Последние отзывы</h3>
+                <hr>
+            </div>
+
+            {% for review in approved_reviews|slice:":3" %}
+                {% if review.is_approved %}
+                <div class="col-md-4 mb-3">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <div class="text-warning mb-2">
+                                {% for i in "12345"|make_list %}
+                                    {% if forloop.counter <= review.rating %}★{% else %}☆{% endif %}
+                                {% endfor %}
+                            </div>
+                            <p class="card-text">{{ review.text|truncatewords:20 }}</p>
+                            <small class="text-muted">
+                                <i class="bi bi-person"></i> {{ review.user.email|truncatechars:20 }}<br>
+                                <i class="bi bi-calendar"></i> {{ review.created_at|date:"d.m.Y" }}
+                            </small>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+            {% endfor %}
+
+            <div class="col-12 text-center">
+                <a href="{% url 'reviews:product_reviews' product.pk %}" class="btn btn-outline-primary">
+                    Читать все отзывы
+                </a>
+            </div>
+        </div>
+        {% endif %}
+    {% endwith %}
+
     {% if related_products %}
     <div class="row mt-5">
         <div class="col-12">
             <h3>Похожие товары</h3>
             <hr>
         </div>
-        
-        {% for product in related_products %}
+
+        {% for related_product in related_products %}
         <div class="col-md-3 mb-4">
             <div class="card h-100 shadow-sm">
+                {% if related_product.image %}
+                    <img src="{{ related_product.image.url }}" class="card-img-top" alt="{{ related_product.name }}" style="height: 150px; object-fit: cover;">
+                {% endif %}
                 <div class="card-body">
-                    <h6 class="card-title">{{ product.name }}</h6>
-                    <p class="text-success">{{ product.price }} ₽</p>
+                    <h6 class="card-title">{{ related_product.name }}</h6>
+                    <p class="text-success">{{ related_product.price }} ₽</p>
                 </div>
                 <div class="card-footer bg-white">
-                    <a href="{% url 'catalog:product_detail' pk=product.pk %}" class="btn btn-sm btn-outline-primary w-100">
+                    <a href="{% url 'catalog:product_detail' pk=related_product.pk %}" class="btn btn-sm btn-outline-primary w-100">
                         Подробнее
                     </a>
                 </div>

@@ -1,26 +1,702 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
+    {% load static %}
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}Натуральная косметика{% endblock %}</title>
+    <title>{% block title %}Kasmia - Натуральная косметика{% endblock %}</title>
 
     <!-- Bootstrap 5 CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Bootstrap Icons -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-    <!-- Custom CSS -->
-    {% load static %}
-    <link href="{% static 'css/style.css' %}" rel="stylesheet">
+    <style>
+         /* Простые и красивые стили */
+        .navbar {
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
 
+        .navbar-brand {
+            font-weight: bold;
+            font-size: 1.3rem;
+            color: rgba(0,0,0,1) !important;
+        }
+
+        /* Фиксированная ширина для всех кнопок навигации */
+        .navbar-nav .nav-link {
+            color: rgba(0,0,0,1) !important;
+            font-weight: 500;
+            transition: all 0.3s;
+            padding: 8px 16px !important;
+            margin: 0 2px !important;
+            white-space: nowrap;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* Фиксированная ширина для иконок */
+        .navbar-nav .nav-link i {
+            width: 20px;
+            font-size: 1.1rem;
+            display: inline-block;
+            text-align: center;
+        }
+
+        .navbar-nav .nav-link:hover {
+            color: #2c5f2d !important;
+            transform: translateY(-2px);
+            background-color: rgba(39, 174, 96, 0.05);
+            border-radius: 8px;
+        }
+
+        /* Корзина с бейджем */
+        .cart-badge {
+            background-color: #ff6b6b;
+            color: white;
+            border-radius: 50%;  /* Это делает круг */
+            width: 18px;
+            height: 18px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+            font-weight: bold;
+            margin-left: 5px;
+            position: relative;
+            top: -2px;
+        }
+
+        /* Стили для мобильных */
+        @media (max-width: 992px) {
+            .navbar-nav {
+                margin-top: 20px;
+                width: 100%;
+            }
+
+            .navbar-nav .nav-link {
+                padding: 12px 16px !important;
+                margin: 5px 0 !important;
+                white-space: normal;
+                justify-content: flex-start;
+            }
+
+            .navbar-nav .nav-link i {
+                width: 25px;
+            }
+        }
+
+        /* Кнопка поиска */
+        .search-btn {
+            background-color: #27ae60;
+            color: white;
+            border: none;
+            border-radius: 0 4px 4px 0;
+        }
+
+        .search-btn:hover {
+            background-color: #1E8C52FF;
+        }
+
+        .search-input {
+            border-radius: 4px 0 0 4px;
+            border-right: none;
+        }
+
+        /* Выпадающее меню - исправленное */
+        .simple-dropdown {
+            position: relative;
+        }
+
+        .simple-dropdown-menu {
+            display: none;
+            position: absolute;
+            top: 100%;
+            left: 0;
+            background: white;
+            min-width: 220px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            border-radius: 8px;
+            padding: 10px 0;
+            z-index: 1000;
+            margin-top: 5px;
+        }
+
+        /* Показываем при наведении на кнопку ИЛИ на само меню */
+        .simple-dropdown:hover .simple-dropdown-menu,
+        .simple-dropdown-menu:hover {
+            display: block;
+        }
+
+        /* Невидимый мостик между кнопкой и меню */
+        .simple-dropdown > a::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 0;
+            right: 0;
+            height: 10px;
+            background: transparent;
+        }
+
+        /* Для правого меню (аккаунт) */
+        @media (min-width: 992px) {
+            .simple-dropdown:last-child .simple-dropdown-menu {
+                left: auto;
+                right: 0;
+            }
+        }
+
+        .simple-dropdown-menu a {
+            display: block;
+            padding: 8px 20px;
+            color: #555;
+            text-decoration: none;
+            transition: all 0.3s;
+        }
+
+        .simple-dropdown-menu a:hover {
+            background-color: #f5f5f5;
+            color: #27ae60;
+            padding-left: 25px;
+        }
+
+        .simple-dropdown-menu button {
+            display: block;
+            width: 100%;
+            text-align: left;
+            padding: 8px 20px;
+            background: none;
+            border: none;
+            color: #dc3545;
+            cursor: pointer;
+        }
+
+        .simple-dropdown-menu button:hover {
+            background-color: #f5f5f5;
+        }
+
+        /* Фикс для выпадающих меню на десктопе */
+        @media (min-width: 992px) {
+            .simple-dropdown-menu {
+                left: auto;
+                right: 0;
+            }
+        }
+
+        /* Кнопка "Наверх" */
+        .back-to-top {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background-color: #209150;
+            color: white;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            text-decoration: none;
+            font-size: 30px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .back-to-top.visible {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .back-to-top:hover {
+            background-color: #27ae60;
+            transform: translateY(-3px);
+        }
+
+
+        /* Анимация появления кнопки */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px) scale(0.8);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+                opacity: 0.4;
+            }
+            70% {
+                transform: scale(1.3);
+                opacity: 0;
+            }
+            100% {
+                transform: scale(1.3);
+                opacity: 0;
+            }
+        }
+
+
+        /* Плавное появление кнопок */
+        .nav-link {
+            transition: all 0.2s ease;
+        }
+
+        .nav-link:hover {
+            transform: translateX(5px);
+        }
+
+        /* Анимация для navbar при скролле */
+        .navbar {
+            transition: box-shadow 0.3s ease;
+        }
+
+        .navbar.scrolled {
+            box-shadow: 0 2px 20px rgba(0,0,0,0.1);
+        }
+
+        /* Анимация для карточек товаров */
+        .card {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
+
+        /* Стили для рейтинга */
+        .rating {
+            display: inline-flex;
+            align-items: center;
+            gap: 2px;
+        }
+
+        .rating i {
+            font-size: 14px;
+            transition: all 0.2s;
+        }
+
+        /* Анимация звезд при наведении на карточку */
+        .card:hover .rating i {
+            animation: starPulse 0.3s ease;
+        }
+
+        @keyframes starPulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+            100% { transform: scale(1); }
+        }
+
+        /* Крупные звезды для детальной страницы */
+        .rating-large i {
+            font-size: 20px;
+        }
+
+        /* Цвета для звезд */
+        .text-warning {
+            color: #ffc107 !important;
+        }
+        /* Темная тема */
+        body.dark-theme {
+            background-color: #121212;
+            color: #e0e0e0;
+        }
+
+        body.dark-theme .navbar {
+            background-color: #1e1e1e !important;
+        }
+
+        body.dark-theme .navbar-brand,
+        body.dark-theme .navbar-nav .nav-link {
+            color: #e0e0e0 !important;
+        }
+
+        body.dark-theme .card {
+            background-color: #1e1e1e;
+        }
+
+        body.dark-theme .simple-dropdown-menu {
+            background-color: #1e1e1e;
+        }
+
+        body.dark-theme .simple-dropdown-menu a {
+            color: #e0e0e0;
+        }
+        /* Темная тема - дополнительные стили */
+        body.dark-theme {
+            background-color: #121212;
+            color: #e0e0e0;
+        }
+
+        body.dark-theme .navbar {
+            background-color: #1e1e1e !important;
+        }
+
+        body.dark-theme .navbar-brand,
+        body.dark-theme .navbar-nav .nav-link {
+            color: #e0e0e0 !important;
+        }
+
+        /* Карточки товаров */
+        body.dark-theme .card {
+            background-color: #1e1e1e;
+            border-color: #2d2d2d;
+        }
+
+        body.dark-theme .card-body {
+            background-color: #1e1e1e;
+            color: #e0e0e0;
+        }
+
+        body.dark-theme .card-title {
+            color: #e0e0e0;
+        }
+
+        body.dark-theme .card-text {
+            color: #a0a0a0;
+        }
+
+        body.dark-theme .card-footer {
+            background-color: #252525;
+            border-top-color: #2d2d2d;
+        }
+
+        /* Кнопки */
+        body.dark-theme .btn-outline-primary {
+            border-color: #27ae60;
+            color: #27ae60;
+        }
+
+        body.dark-theme .btn-outline-primary:hover {
+            background-color: #27ae60;
+            color: #121212;
+        }
+
+        body.dark-theme .btn-success {
+            background-color: #27ae60;
+            border-color: #27ae60;
+        }
+
+        body.dark-theme .btn-success:hover {
+            background-color: #2ecc71;
+        }
+
+        /* Фильтры (меню типов кожи) */
+        body.dark-theme .list-group-item {
+            background-color: #1e1e1e;
+            color: #e0e0e0;
+            border-color: #2d2d2d;
+        }
+
+        body.dark-theme .list-group-item:hover {
+            background-color: #2d2d2d;
+            color: #27ae60;
+        }
+
+        body.dark-theme .list-group-item-action {
+            color: #e0e0e0;
+        }
+
+        /* Карточка фильтров */
+        body.dark-theme .card-header.bg-success {
+            background-color: #27ae60 !important;
+        }
+
+        body.dark-theme .card-header.bg-success h5 {
+            color: #121212;
+        }
+
+        /* Цены */
+        body.dark-theme .text-success,
+        body.dark-theme .h5.text-success,
+        body.dark-theme .price {
+            color: #27ae60 !important;
+        }
+
+        /* Badge "В наличии" */
+        body.dark-theme .badge.bg-success {
+            background-color: #27ae60 !important;
+            color: #121212;
+        }
+
+        /* Форма поиска */
+        body.dark-theme .form-control,
+        body.dark-theme .search-input {
+            background-color: #2d2d2d;
+            border-color: #3d3d3d;
+            color: #e0e0e0;
+        }
+
+        body.dark-theme .form-control::placeholder,
+        body.dark-theme .search-input::placeholder {
+            color: #888;
+        }
+
+        body.dark-theme .form-control:focus,
+        body.dark-theme .search-input:focus {
+            background-color: #2d2d2d;
+            color: #e0e0e0;
+        }
+
+        /* Выпадающие меню */
+        body.dark-theme .simple-dropdown-menu {
+            background-color: #1e1e1e;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+
+        body.dark-theme .simple-dropdown-menu a {
+            color: #e0e0e0;
+        }
+
+        body.dark-theme .simple-dropdown-menu a:hover {
+            background-color: #2d2d2d;
+            color: #27ae60;
+        }
+
+        /* Пагинация */
+        body.dark-theme .page-link {
+            background-color: #1e1e1e;
+            color: #e0e0e0;
+            border-color: #2d2d2d;
+        }
+
+        body.dark-theme .page-link:hover {
+            background-color: #2d2d2d;
+            color: #27ae60;
+        }
+
+        body.dark-theme .page-item.active .page-link {
+            background-color: #27ae60;
+            border-color: #27ae60;
+            color: #121212;
+        }
+
+        /* Alert сообщения */
+        body.dark-theme .alert-success {
+            background-color: #1a3a2a;
+            color: #27ae60;
+            border: none;
+        }
+
+        body.dark-theme .alert-danger {
+            background-color: #3a1a1a;
+            color: #e74c3c;
+            border: none;
+        }
+
+        /* Кнопка "Наверх" */
+        body.dark-theme .back-to-top {
+            background-color: #27ae60;
+        }
+
+        body.dark-theme .back-to-top:hover {
+            background-color: #2ecc71;
+        }
+
+        /* Текст на карточках */
+        body.dark-theme .card-text.text-muted {
+            color: #a0a0a0 !important;
+        }
+
+        /* Разделители */
+        body.dark-theme hr {
+            border-color: #2d2d2d;
+        }
+
+
+        body.dark-theme .btn-outline-primary,
+        body.dark-theme .btn-outline-primary:link,
+        body.dark-theme .btn-outline-primary:visited {
+            background-color: transparent !important;
+            border-color: #27ae60 !important;
+            color: #27ae60 !important;
+        }
+
+        body.dark-theme .btn-outline-primary:hover,
+        body.dark-theme .btn-outline-primary:active,
+        body.dark-theme .btn-outline-primary:focus {
+            background-color: #27ae60 !important;
+            color: #121212 !important;
+            border-color: #27ae60 !important;
+        }
+
+        body.dark-theme .btn-success,
+        body.dark-theme .btn-success:link,
+        body.dark-theme .btn-success:visited {
+            background-color: #27ae60 !important;
+            color: #121212 !important;
+            border: none !important;
+        }
+
+        body.dark-theme .btn-success:hover,
+        body.dark-theme .btn-success:active,
+        body.dark-theme .btn-success:focus {
+            background-color: #2ecc71 !important;
+            color: #121212 !important;
+        }
+
+        /* Фон карточек */
+        body.dark-theme .card {
+            background-color: #1e1e1e !important;
+        }
+
+        body.dark-theme .card-footer {
+            background-color: #252525 !important;
+        }
+        body.dark-theme .rating i {
+            color: #ffc107 !important;  /* Желтые звезды */
+        }
+
+        body.dark-theme .rating .bi-star {
+            color: #555 !important;  /* Пустые звезды - серые, но видимые */
+        }
+
+        body.dark-theme .text-warning {
+            color: #ffc107 !important;
+        }
+
+        /* Для пустых звезд (без оценки) */
+        body.dark-theme .rating i.bi-star {
+            color: #6c757d !important;  /* Светло-серые, видимые на темном фоне */
+        }
+
+        /* Если используете обычные звезды (не иконки Bootstrap) */
+        body.dark-theme .rating .star-empty {
+            color: #6c757d;
+        }
+
+        body.dark-theme .rating .star-full {
+            color: #ffc107;
+        }
+
+        /* Для текста "Нет отзывов" */
+        body.dark-theme .rating .text-muted {
+            color: #a0a0a0 !important;
+        }
+        body.dark-theme .rating .small {
+            color: #c0c0c0 !important;
+        }
+        /* Темная тема для модальных окон */
+        body.dark-theme .modal-content {
+            background-color: #1e1e1e;
+            border: 1px solid #2d2d2d;
+        }
+
+        body.dark-theme .modal-header {
+            border-bottom-color: #2d2d2d;
+        }
+
+        body.dark-theme .modal-footer {
+            border-top-color: #2d2d2d;
+        }
+
+        body.dark-theme .modal-body label {
+            color: #e0e0e0;
+        }
+        body.dark-theme .table {
+            background-color: #1e1e1e;
+            color: #e0e0e0;
+        }
+
+        /* Шапка таблицы */
+        body.dark-theme .table thead th,
+        body.dark-theme .table thead td,
+        body.dark-theme .table-light thead th,
+        body.dark-theme .table-light {
+            background-color: #2a2a2a !important;
+            color: #e0e0e0 !important;
+            border-bottom-color: #3d3d3d;
+        }
+
+        /* Ячейки таблицы */
+        body.dark-theme .table td,
+        body.dark-theme .table th {
+            background-color: #1e1e1e;
+            color: #e0e0e0;
+            border-top-color: #3d3d3d;
+            border-bottom-color: #3d3d3d;
+        }
+
+        /* Строки таблицы при наведении */
+        body.dark-theme .table tbody tr:hover td,
+        body.dark-theme .table tbody tr:hover th {
+            background-color: #2a2a2a;
+        }
+
+        /* Границы таблицы */
+        body.dark-theme .table-bordered,
+        body.dark-theme .table-bordered td,
+        body.dark-theme .table-bordered th {
+            border-color: #3d3d3d;
+        }
+
+        /* Текст в ячейках */
+        body.dark-theme .table td,
+        body.dark-theme .table th,
+        body.dark-theme .table .text-muted {
+            color: #e0e0e0;
+        }
+
+        /* Цена и сумма */
+        body.dark-theme .table .text-success {
+            color: #27ae60 !important;
+        }
+
+        /* Кнопки внутри таблицы */
+        body.dark-theme .table .btn-sm {
+            background-color: #2d2d2d;
+            border-color: #3d3d3d;
+            color: #e0e0e0;
+        }
+
+        body.dark-theme .table .btn-sm:hover {
+            background-color: #3d3d3d;
+            color: #27ae60;
+        }
+
+        /* Итого в корзине */
+        body.dark-theme .table tfoot td,
+        body.dark-theme .table tfoot th {
+            background-color: #2a2a2a;
+            color: #e0e0e0;
+            font-weight: bold;
+        }
+
+        /* Карточка корзины */
+        body.dark-theme .card {
+            background-color: #1e1e1e;
+            border-color: #2d2d2d;
+        }
+
+        body.dark-theme .card-header {
+            background-color: #27ae60 !important;
+            border-bottom-color: #2d2d2d;
+        }
+
+        body.dark-theme .card-header h4 {
+            color: #121212;
+        }
+
+        body.dark-theme .card-body {
+            background-color: #1e1e1e;
+        }
+    </style>
     {% block extra_css %}{% endblock %}
 </head>
-<body>
+<body class="d-flex flex-column min-vh-100">
     <!-- Header -->
-    <nav class="navbar navbar-expand-lg navbar-light bg-light sticky-top">
+    <nav class="navbar navbar-expand-lg navbar-light bg-white sticky-top">
         <div class="container">
             <a class="navbar-brand" href="{% url 'catalog:home' %}">
-                <i class="bi bi-flower1"></i> Натуральная косметика
+                <i class="bi bi-flower1"></i> Kasmia - Натуральная косметика
             </a>
 
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarMain">
@@ -29,42 +705,103 @@
 
             <div class="collapse navbar-collapse" id="navbarMain">
                 <!-- Поиск -->
-                <form class="d-flex mx-auto w-50" action="{% url 'catalog:search' %}" method="get">
-                    <input class="form-control me-2" type="search" name="q" placeholder="Поиск товаров..." value="{{ query|default:'' }}">
-                    <button class="btn btn-outline-success" type="submit"><i class="bi bi-search"></i></button>
+                <form class="d-flex mx-auto" style="width: 60%; min-width: 300px; max-width: 800px;" action="{% url 'catalog:search' %}" method="get">
+                    <input class="form-control search-input" type="search" name="q" placeholder="Поиск товаров..." value="{{ query|default:'' }}">
+                    <button class="btn search-btn" type="submit">
+                        <i class="bi bi-search"></i>
+                    </button>
                 </form>
+
+                <!-- Меню -->
+                <ul class="navbar-nav ms-auto">
+                    <!-- Категории -->
+                    <li class="nav-item simple-dropdown">
+                        <a class="nav-link" href="#">
+                            <i class="bi bi-grid"></i> Категории <i class="bi bi-chevron-down"></i>
+                        </a>
+                        <div class="simple-dropdown-menu">
+                            <a href="{% url 'catalog:home' %}"><i class="bi bi-collection me-2"></i> Все товары</a>
+                            <div style="height: 1px; background: #eee; margin: 5px 0;"></div>
+                            {% for category in categories %}
+                            <a href="{% url 'catalog:category_detail' slug=category.slug %}">
+                                <i class="bi bi-tag me-2"></i> {{ category.name }}
+                            </a>
+                            {% endfor %}
+                        </div>
+                    </li>
+
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'catalog:favorites' %}">
+                            <i class="bi bi-heart"></i> Избранное
+                        </a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'cart:detail' %}">
+                            <i class="bi bi-cart"></i> Корзина
+                            {% if cart and cart|length > 0 %}
+                            <span class="cart-badge">{{ cart|length }}</span>
+                            {% endif %}
+                        </a>
+                    </li>
+
+                    {% if user.is_authenticated %}
+                        <li class="nav-item simple-dropdown">
+                            <a class="nav-link" href="#">
+                                <i class="bi bi-person-circle"></i> {{ user.first_name|default:user.email }} <i class="bi bi-chevron-down"></i>
+                            </a>
+                            <div class="simple-dropdown-menu">
+                                <a href="{% url 'users:profile' %}"><i class="bi bi-person-badge me-2"></i> Профиль</a>
+                                <a href="{% url 'reviews:my_reviews' %}"><i class="bi bi-chat-dots me-2"></i> Мои отзывы</a>
+
+                                {% if user.is_admin %}
+                                    <div style="height: 1px; background: #eee; margin: 5px 0;"></div>
+                                    <a href="{% url 'catalog:product_create' %}"><i class="bi bi-plus-circle me-2"></i> Добавить товар</a>
+                                    <a href="{% url 'users:user_list' %}"><i class="bi bi-people me-2"></i> Пользователи</a>
+                                {% endif %}
+
+                                {% if user.is_moderator and not user.is_admin %}
+                                    <div style="height: 1px; background: #eee; margin: 5px 0;"></div>
+                                    <a href="{% url 'reviews:moderation_list' %}"><i class="bi bi-shield-check me-2"></i> Модерация</a>
+                                {% endif %}
+
+                                <div style="height: 1px; background: #eee; margin: 5px 0;"></div>
+                                <form method="post" action="{% url 'users:logout' %}">
+                                    {% csrf_token %}
+                                    <button type="submit">
+                                        <i class="bi bi-box-arrow-right me-2"></i> Выйти
+                                    </button>
+                                </form>
+                            </div>
+                        </li>
+                    {% else %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="#" data-bs-toggle="modal" data-bs-target="#loginModal">
+                                <i class="bi bi-box-arrow-in-right"></i> Вход
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#" data-bs-toggle="modal" data-bs-target="#registerModal">
+                                <i class="bi bi-person-plus"></i> Регистрация
+                            </a>
+                        </li>
+                    {% endif %}
+                    <li class="nav-item">
+                        <button id="themeToggle" class="nav-link" style="background: none; border: none; cursor: pointer;">
+                            <i class="bi bi-moon"></i>
+                        </button>
+                    </li>
                 </ul>
             </div>
         </div>
     </nav>
-
-    <!-- Категории -->
-    <div class="bg-white border-bottom">
-        <div class="container">
-            <div class="row py-2">
-                <div class="col-12">
-                    <ul class="nav nav-pills justify-content-center">
-                        <li class="nav-item">
-                            <a class="nav-link {% if request.path == '/' %}active{% endif %}" href="{% url 'catalog:home' %}">Все</a>
-                        </li>
-                        {% for category in categories %}
-                        <li class="nav-item">
-                            <a class="nav-link" href="{% url 'catalog:category_detail' slug=category.slug %}">
-                                {{ category.name }}
-                            </a>
-                        </li>
-                        {% endfor %}
-                    </ul>
-                </div>
-            </div>
-        </div>
-    </div>
 
     <!-- Messages -->
     <div class="container mt-3">
         {% if messages %}
             {% for message in messages %}
                 <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                    <i class="bi bi-{% if message.tags == 'success' %}check-circle{% elif message.tags == 'error' %}exclamation-circle{% elif message.tags == 'warning' %}exclamation-triangle{% else %}info-circle{% endif %} me-2"></i>
                     {{ message }}
                     <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                 </div>
@@ -73,21 +810,21 @@
     </div>
 
     <!-- Main Content -->
-    <main>
+    <main class="flex-grow-1">
         {% block content %}{% endblock %}
     </main>
 
     <!-- Footer -->
-    <footer class="bg-dark text-white mt-5 py-4">
+    <footer class="bg-dark text-white py-4 mt-auto">
         <div class="container">
             <div class="row">
                 <div class="col-md-4">
-                    <h5><i class="bi bi-flower1"></i> Натуральная косметика</h5>
+                    <h5><i class="bi bi-flower1"></i> Kasmia</h5>
                     <p>Только натуральные ингредиенты. Забота о вашей коже и природе.</p>
                 </div>
                 <div class="col-md-4">
                     <h5>Контакты</h5>
-                    <p><i class="bi bi-envelope"></i> info@natural-cosmetics.ru</p>
+                    <p><i class="bi bi-envelope"></i> info@kasmia.ru</p>
                     <p><i class="bi bi-telephone"></i> +7 (999) 123-45-67</p>
                 </div>
                 <div class="col-md-4">
@@ -101,15 +838,235 @@
             </div>
             <hr>
             <div class="text-center">
-                <p class="mb-0">&copy; 2024 Натуральная косметика. Все права защищены.</p>
+                <p class="mb-0">&copy; 2026 Kasmia | Натуральная косметика. Все права защищены.</p>
             </div>
         </div>
     </footer>
+    <!-- Модальное окно Входа -->
+    <div class="modal fade" id="loginModal" tabindex="-1" aria-labelledby="loginModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header bg-success text-white">
+                    <h5 class="modal-title" id="loginModalLabel">
+                        <i class="bi bi-box-arrow-in-right"></i> Вход в аккаунт
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="loginForm" method="post" action="{% url 'users:login' %}">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <label for="login-email" class="form-label">Email</label>
+                            <input type="email" class="form-control" id="login-email" name="username" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="login-password" class="form-label">Пароль</label>
+                            <input type="password" class="form-control" id="login-password" name="password" required>
+                        </div>
+                        <button type="submit" class="btn btn-success w-100">
+                            <i class="bi bi-box-arrow-in-right"></i> Войти
+                        </button>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <p class="mb-0">Нет аккаунта?
+                        <a href="#" id="switchToRegister" class="text-success">Зарегистрироваться</a>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
 
+    <!-- Модальное окно Регистрации -->
+    <div class="modal fade" id="registerModal" tabindex="-1" aria-labelledby="registerModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header bg-success text-white">
+                    <h5 class="modal-title" id="registerModalLabel">
+                        <i class="bi bi-person-plus"></i> Регистрация
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="registerForm" method="post" action="{% url 'users:register' %}">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <label for="register-email" class="form-label">Email</label>
+                            <input type="email" class="form-control" id="register-email" name="email" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="register-firstname" class="form-label">Имя</label>
+                            <input type="text" class="form-control" id="register-firstname" name="first_name">
+                        </div>
+                        <div class="mb-3">
+                            <label for="register-lastname" class="form-label">Фамилия</label>
+                            <input type="text" class="form-control" id="register-lastname" name="last_name">
+                        </div>
+                        <div class="mb-3">
+                            <label for="register-password1" class="form-label">Пароль</label>
+                            <input type="password" class="form-control" id="register-password1" name="password1" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="register-password2" class="form-label">Подтверждение пароля</label>
+                            <input type="password" class="form-control" id="register-password2" name="password2" required>
+                        </div>
+                        <button type="submit" class="btn btn-success w-100">
+                            <i class="bi bi-person-plus"></i> Зарегистрироваться
+                        </button>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <p class="mb-0">Уже есть аккаунт?
+                        <a href="#" id="switchToLogin" class="text-success">Войти</a>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+    <a href="#" class="back-to-top" id="backToTop">↑</a>
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
     <!-- Custom JS -->
-    <script src="{% static 'js/main.js' %}"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // ========== ПЕРЕКЛЮЧЕНИЕ ТЕМЫ ==========
+            const themeToggle = document.getElementById('themeToggle');
+
+            if (themeToggle) {
+                const themeIcon = themeToggle.querySelector('i');
+
+                // Проверяем сохраненную тему в localStorage
+                const savedTheme = localStorage.getItem('theme');
+                if (savedTheme === 'dark') {
+                    document.body.classList.add('dark-theme');
+                    if (themeIcon) {
+                        themeIcon.classList.remove('bi-moon');
+                        themeIcon.classList.add('bi-sun');
+                    }
+                }
+
+                // Обработчик кнопки
+                themeToggle.addEventListener('click', function() {
+                    document.body.classList.toggle('dark-theme');
+
+                    if (themeIcon) {
+                        if (document.body.classList.contains('dark-theme')) {
+                            themeIcon.classList.remove('bi-moon');
+                            themeIcon.classList.add('bi-sun');
+                            localStorage.setItem('theme', 'dark');
+                        } else {
+                            themeIcon.classList.remove('bi-sun');
+                            themeIcon.classList.add('bi-moon');
+                            localStorage.setItem('theme', 'light');
+                        }
+                    }
+                });
+            }
+
+            // ========== КНОПКА "НАВЕРХ" ==========
+            const backToTopButton = document.getElementById('backToTop');
+
+            if (backToTopButton) {
+                window.addEventListener('scroll', function() {
+                    if (window.pageYOffset > 60) {
+                        backToTopButton.classList.add('visible');
+                    } else {
+                        backToTopButton.classList.remove('visible');
+                    }
+                });
+
+                backToTopButton.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    window.scrollTo({
+                        top: 0,
+                        behavior: 'smooth'
+                    });
+                });
+            }
+        });
+        function addToCart(productId, buttonElement, quantity = 1) {
+    // Сохраняем оригинальный текст кнопки
+    const originalText = buttonElement.innerHTML;
+    const originalClass = buttonElement.className;
+
+    // Меняем текст и стиль кнопки
+    buttonElement.innerHTML = '<i class="bi bi-check-lg"></i> Добавлено!';
+    buttonElement.classList.add('btn-success');
+    buttonElement.classList.remove('btn-outline-primary');
+    buttonElement.disabled = true;
+
+    fetch(`/cart/add/${productId}/`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': getCookie('csrftoken')
+        },
+        body: JSON.stringify({ quantity: quantity })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            // Обновляем счетчик корзины
+            const cartCount = document.getElementById('cart-count');
+            if (cartCount) {
+                cartCount.innerText = data.cart_total;
+            }
+            showMessage('Товар добавлен в корзину!', 'success');
+
+            // Возвращаем кнопку в исходное состояние через 2 секунды
+            setTimeout(() => {
+                buttonElement.innerHTML = originalText;
+                buttonElement.className = originalClass;
+                buttonElement.disabled = false;
+            }, 2000);
+        } else {
+            // Если ошибка, возвращаем кнопку обратно
+            buttonElement.innerHTML = originalText;
+            buttonElement.className = originalClass;
+            buttonElement.disabled = false;
+            showMessage(data.error || 'Ошибка при добавлении', 'danger');
+        }
+    })
+    .catch(error => {
+        buttonElement.innerHTML = originalText;
+        buttonElement.className = originalClass;
+        buttonElement.disabled = false;
+        console.error('Error:', error);
+        showMessage('Ошибка при добавлении товара', 'danger');
+    });
+}
+    // Переключение между модальными окнами
+    document.addEventListener('DOMContentLoaded', function() {
+        // Переключение на регистрацию
+        const switchToRegister = document.getElementById('switchToRegister');
+        if (switchToRegister) {
+            switchToRegister.addEventListener('click', function(e) {
+                e.preventDefault();
+                const loginModal = bootstrap.Modal.getInstance(document.getElementById('loginModal'));
+                loginModal.hide();
+                setTimeout(() => {
+                    const registerModal = new bootstrap.Modal(document.getElementById('registerModal'));
+                    registerModal.show();
+                }, 300);
+            });
+        }
+
+        // Переключение на вход
+        const switchToLogin = document.getElementById('switchToLogin');
+        if (switchToLogin) {
+            switchToLogin.addEventListener('click', function(e) {
+                e.preventDefault();
+                const registerModal = bootstrap.Modal.getInstance(document.getElementById('registerModal'));
+                registerModal.hide();
+                setTimeout(() => {
+                    const loginModal = new bootstrap.Modal(document.getElementById('loginModal'));
+                    loginModal.show();
+                }, 300);
+            });
+        }
+    });
+    </script>
+
     {% block extra_js %}{% endblock %}
 </body>
 </html>

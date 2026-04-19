@@ -54,6 +54,9 @@
         <div class="d-flex justify-content-between">
             <a href="{% url 'catalog:home' %}" class="btn btn-outline-primary">Продолжить покупки</a>
             <form method="post" action="{% url 'cart:clear' %}">
+                <a href="{% url 'orders:order_create' %}" class="btn btn-success">
+                    <i class="bi bi-credit-card"></i> Оформить заказ
+                </a>
                 {% csrf_token %}
                 <button type="submit" class="btn btn-outline-danger">Очистить корзину</button>
             </form>

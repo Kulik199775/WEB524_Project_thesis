@@ -117,9 +117,11 @@ class Product(models.Model):
     @property
     def average_rating(self):
         """Средний рейтинг товара"""
+        from django.db.models import Avg
         reviews = self.reviews.filter(is_approved=True)
         if reviews.exists():
-            return round(reviews.aggregate(models.Avg('rating'))['rating__avg'], 1)
+            avg = reviews.aggregate(Avg('rating'))['rating__avg']
+            return round(avg, 1) if avg else 0
         return 0
 
     @property

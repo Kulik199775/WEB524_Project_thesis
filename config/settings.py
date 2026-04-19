@@ -39,12 +39,13 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
 
+
     # мои приложения
     'users',
     'catalog',
     'common',
     'cart',
-    'reviews',
+    'reviews.apps.ReviewsConfig',
     'orders',
 ]
 
@@ -162,7 +163,6 @@ MEDIA_ROOT = (
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 AUTH_USER_MODEL = 'users.User'
 
-
 # LOGIN_REDIRECT_URL = "dogs:index"
 # LOGOUT_REDIRECT_URL = "dogs:index"
 # LOGIN_URL = 'users:user_login'
@@ -198,5 +198,4 @@ DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 EMAIL_ADMIN = EMAIL_HOST_USER
 
 VERIFICATION_CODE_EXPIRY_MINUTES = 10  # Время жизни кода (10 минут)
-VERIFICATION_CODE_LENGTH = 6 # Длина кода
-
+VERIFICATION_CODE_LENGTH = 6  # Длина кода

@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load static %}
 
 {% block title %}{{ title }}{% endblock %}
 
@@ -8,41 +9,54 @@
         <div class="col-md-8">
             <div class="card shadow">
                 <div class="card-header bg-success text-white">
-                    <h4 class="mb-0">{{ title }}</h4>
+                    <h4 class="mb-0">
+                        <i class="bi bi-pencil-square"></i>
+                        {{ title }}
+                    </h4>
                 </div>
                 <div class="card-body">
-                    <div class="mb-4">
-                        <h5>{{ product.name }}</h5>
-                        <p class="text-muted">{{ product.price }} ₽</p>
-                    </div>
-                    
                     <form method="post">
                         {% csrf_token %}
-                        
+
+                        <!-- Оценка -->
                         <div class="mb-3">
-                            <label for="{{ form.rating.id_for_label }}" class="form-label">Оценка</label>
+                            <label class="form-label fw-bold">{{ form.rating.label }}</label>
                             {{ form.rating }}
                             {% if form.rating.errors %}
-                                <div class="alert alert-danger mt-1">{{ form.rating.errors }}</div>
+                                <div class="invalid-feedback d-block">
+                                    {% for error in form.rating.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
                             {% endif %}
                         </div>
-                        
+
+                        <!-- Текст отзыва -->
                         <div class="mb-3">
-                            <label for="{{ form.text.id_for_label }}" class="form-label">Ваш отзыв</label>
+                            <label class="form-label fw-bold">{{ form.text.label }}</label>
                             {{ form.text }}
                             {% if form.text.errors %}
-                                <div class="alert alert-danger mt-1">{{ form.text.errors }}</div>
+                                <div class="alert alert-danger mt-2">
+                                    <i class="bi bi-exclamation-triangle-fill"></i>
+                                    {% for error in form.text.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
                             {% endif %}
-                            <small class="text-muted">Поделитесь впечатлениями о продукте</small>
+                            <small class="text-muted">
+                                <i class="bi bi-info-circle"></i>
+                                Минимум 10 символов, максимум 2000 символов.
+                                Пожалуйста, соблюдайте правила вежливости.
+                            </small>
                         </div>
-                        
-                        <div class="d-flex justify-content-between">
-                            <a href="{% url 'catalog:product_detail' pk=product.pk %}" class="btn btn-secondary">
-                                <i class="bi bi-arrow-left"></i> Назад
-                            </a>
+
+                        <div class="d-flex gap-2">
                             <button type="submit" class="btn btn-success">
                                 <i class="bi bi-send"></i> Отправить отзыв
                             </button>
+                            <a href="{% url 'catalog:product_detail' pk=product.pk %}" class="btn btn-outline-secondary">
+                                <i class="bi bi-arrow-left"></i> Отмена
+                            </a>
                         </div>
                     </form>
                 </div>

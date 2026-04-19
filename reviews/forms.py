@@ -1,5 +1,6 @@
 from django import forms
 from .models import Review
+from better_profanity import profanity
 
 
 class ReviewForm(forms.ModelForm):
@@ -26,6 +27,30 @@ class ReviewForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields['rating'].choices = [(i, '★' * i) for i in range(1, 6)]
+
+    def clean_text(self):
+        """Валидация текста отзыва на наличие запрещенных слов"""
+        text = self.cleaned_data.get('text', '')
+
+        if not text or not text.strip():
+            raise forms.ValidationError('Отзыв не может быть пустым.')
+
+        # Проверка на минимальную длину
+        if len(text.strip()) < 10:
+            raise forms.ValidationError('Отзыв должен содержать не менее 10 символов.')
+
+        # Проверка на максимальную длину
+        if len(text) > 2000:
+            raise forms.ValidationError('Отзыв не должен превышать 2000 символов.')
+
+        # Проверка на запрещенные слова через better-profanity
+        if profanity.contains_profanity(text):
+            raise forms.ValidationError(
+                'Ваш отзыв содержит недопустимые выражения. '
+                'Пожалуйста, отредактируйте текст перед отправкой.'
+            )
+
+        return text
 
 
 class ReviewModerationForm(forms.ModelForm):

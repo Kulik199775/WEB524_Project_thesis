@@ -2,3 +2,4 @@ mssql-django
 python-dotenv
 Pillow
 redis
+better-profanity

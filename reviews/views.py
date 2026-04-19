@@ -155,7 +155,7 @@ class UserReviewsView(LoginRequiredMixin, ListView):
 
 
 class ProductReviewsView(ListView):
-    """Список отзывов на товар с пагинацией"""
+    """Список отзывов на товар с пагинацией и статистикой"""
     model = Review
     template_name = 'reviews/product_reviews.html'
     context_object_name = 'reviews'
@@ -173,13 +173,31 @@ class ProductReviewsView(ListView):
         context['product'] = self.product
         context['title'] = f'Отзывы на {self.product.name}'
 
-        # Статистика отзывов
-        from django.db.models import Avg, Count, Q
-        reviews_stats = Review.objects.filter(product=self.product, is_approved=True).aggregate(
-            avg_rating=Avg('rating'),
-            total_reviews=Count('id'),
-        )
-        context['stats'] = reviews_stats
+        # Получаем все одобренные отзывы для статистики
+        approved_reviews = Review.objects.filter(product=self.product, is_approved=True)
+        total_reviews = approved_reviews.count()
+        avg_rating = approved_reviews.aggregate(Avg('rating'))['rating__avg'] or 0
+
+        # Подсчет количества оценок по звездам
+        rating_counts = {5: 0, 4: 0, 3: 0, 2: 0, 1: 0}
+        for review in approved_reviews:
+            if review.rating in rating_counts:
+                rating_counts[review.rating] += 1
+
+        # Подсчет процентов
+        rating_percentages = {}
+        for star in [5, 4, 3, 2, 1]:
+            if total_reviews > 0:
+                rating_percentages[star] = round((rating_counts[star] / total_reviews) * 100)
+            else:
+                rating_percentages[star] = 0
+
+        context['stats'] = {
+            'total_reviews': total_reviews,
+            'avg_rating': round(avg_rating, 1),
+            'rating_counts': rating_counts,
+            'rating_percentages': rating_percentages,
+        }
 
         # Проверка, оставлял ли пользователь отзыв
         if self.request.user.is_authenticated:

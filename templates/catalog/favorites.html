@@ -1,37 +1,54 @@
 {% extends 'base.html' %}
+{% load static %}
 
 {% block title %}Избранные товары{% endblock %}
 
 {% block content %}
 <div class="container my-4">
     <h1 class="mb-4">Мои избранные товары</h1>
-    
+
     <div class="row">
         {% for favorite in favorites %}
         <div class="col-md-4 mb-4">
-            <div class="card h-100 shadow-sm">
-                {% if favorite.product.image %}
-                    <img src="{{ favorite.product.image.url }}" class="card-img-top" alt="{{ favorite.product.name }}" style="height: 200px; object-fit: cover;">
-                {% else %}
-                    <div class="bg-secondary text-white text-center py-5">Нет фото</div>
-                {% endif %}
-                
-                <div class="card-body">
+            <div class="card h-100 shadow-sm d-flex flex-column">
+                <!-- Контейнер для изображения с фиксированной высотой -->
+                <div class="card-img-top-wrapper" style="height: 250px; overflow: hidden; position: relative;">
+                    {% if favorite.product.image %}
+                        <img src="{{ favorite.product.image.url }}"
+                             class="card-img-top"
+                             alt="{{ favorite.product.name }}"
+                             style="width: 100%; height: 100%; object-fit: cover; object-position: center;">
+                    {% else %}
+                        <div class="bg-secondary text-white text-center py-5" style="height: 100%; display: flex; align-items: center; justify-content: center;">
+                            <i class="bi bi-image" style="font-size: 3rem;"></i>
+                            <p class="mb-0">Нет фото</p>
+                        </div>
+                    {% endif %}
+                </div>
+
+                <div class="card-body d-flex flex-column flex-grow-1">
                     <h5 class="card-title">{{ favorite.product.name }}</h5>
-                    <p class="card-text text-muted small">{{ favorite.product.description|truncatewords:15 }}</p>
-                    <div class="d-flex justify-content-between align-items-center">
-                        <span class="h5 text-success">{{ favorite.product.price }} ₽</span>
-                        {% if favorite.product.is_available %}
-                            <span class="badge bg-success">В наличии</span>
-                        {% else %}
-                            <span class="badge bg-danger">Нет в наличии</span>
-                        {% endif %}
+                    <p class="card-text text-muted small flex-grow-1" style="min-height: 60px;">
+                        {{ favorite.product.description|truncatewords:15 }}
+                    </p>
+
+                    <!-- Блок с ценой и наличием -->
+                    <div class="mt-auto">
+                        <div class="d-flex justify-content-between align-items-center pt-2">
+                            <span class="h4 text-success mb-0">{{ favorite.product.price }} ₽</span>
+                            {% if favorite.product.is_available %}
+                                <span class="badge bg-success px-3 py-2">В наличии</span>
+                            {% else %}
+                                <span class="badge bg-danger px-3 py-2">Нет в наличии</span>
+                            {% endif %}
+                        </div>
                     </div>
                 </div>
-                
-                <div class="card-footer bg-white">
-                    <div class="btn-group w-100">
-                        <a href="{% url 'catalog:product_detail' pk=favorite.product.pk %}" class="btn btn-outline-primary btn-sm">
+
+                <div class="card-footer bg-white border-top-0">
+                    <div class="btn-group w-100 gap-2">
+                        <a href="{% url 'catalog:product_detail' pk=favorite.product.pk %}"
+                           class="btn btn-outline-primary btn-sm">
                             <i class="bi bi-eye"></i> Подробнее
                         </a>
                         <form method="post" action="{% url 'catalog:remove_from_favorite' pk=favorite.product.pk %}" class="d-inline">
@@ -52,7 +69,7 @@
         </div>
         {% endfor %}
     </div>
-    
+
     <!-- Пагинация -->
     {% include 'includes/pagination.html' %}
 </div>

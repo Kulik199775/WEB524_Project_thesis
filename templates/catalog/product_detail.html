@@ -17,21 +17,52 @@
 
     <div class="row">
         <div class="col-md-6">
-            {% if product.image %}
-                <img src="{{ product.image.url }}" class="img-fluid rounded shadow" alt="{{ product.name }}">
-            {% else %}
-                <div class="bg-secondary text-white text-center py-5 rounded">
-                    <i class="bi bi-image" style="font-size: 5rem;"></i>
-                    <p>Нет изображения</p>
-                </div>
-            {% endif %}
+            <div class="sticky-image">
+                {% if product.image %}
+                    <img src="{{ product.image.url }}" class="img-fluid rounded shadow" alt="{{ product.name }}">
+                {% else %}
+                    <div class="bg-secondary text-white text-center py-5 rounded">
+                        <i class="bi bi-image" style="font-size: 5rem;"></i>
+                        <p>Нет изображения</p>
+                    </div>
+                {% endif %}
+            </div>
         </div>
 
         <div class="col-md-6">
-            <h1>{{ product.name }}</h1>
+            <h3>{{ product.name }}</h3>
+
+            <!-- ========== Звезды рейтинга========== -->
+            <div class="mb-3">
+                {% with avg_rating=product.average_rating reviews_count=product.reviews_count %}
+                    <div class="rating d-flex align-items-center">
+                        {% if reviews_count > 0 %}
+                            {% for i in "12345"|make_list %}
+                                {% with num=forloop.counter|add:0 %}
+                                    {% if num <= avg_rating %}
+                                        <i class="bi bi-star-fill" style="color: #ffc107 !important; font-size: 1.2rem;"></i>
+                                    {% elif num <= avg_rating|add:"0.5" %}
+                                        <i class="bi bi-star-half" style="color: #ffc107 !important; font-size: 1.2rem;"></i>
+                                    {% else %}
+                                        <i class="bi bi-star" style="color: #dee2e6 !important; font-size: 1.2rem;"></i>
+                                    {% endif %}
+                                {% endwith %}
+                            {% endfor %}
+                            <span class="text-muted ms-2">
+                                {{ avg_rating|default:"0" }} / 5 ({{ reviews_count }})
+                            </span>
+                        {% else %}
+                            {% for i in "12345"|make_list %}
+                                <i class="bi bi-star" style="color: #dee2e6 !important; font-size: 1.2rem;"></i>
+                            {% endfor %}
+                            <span class="text-muted ms-2">Нет отзывов</span>
+                        {% endif %}
+                    </div>
+                {% endwith %}
+            </div>
 
             <div class="mb-3">
-                <span class="h2 text-success">{{ product.price }} ₽</span>
+                <span class="h3 text-success">{{ product.price }} ₽</span>
                 {% if product.is_available %}
                     <span class="badge bg-success ms-2">В наличии ({{ product.stock }} шт.)</span>
                 {% else %}
@@ -139,7 +170,6 @@
                 <h5><i class="bi bi-chat-dots"></i> Отзывы о товаре</h5>
 
                 {% if user.is_authenticated %}
-                    <!-- Проверяем, оставлял ли пользователь уже отзыв -->
                     {% with user_review=product.reviews.filter|first %}
                         {% if user_review %}
                             <div class="alert alert-info">
@@ -160,7 +190,7 @@
                 {% endif %}
 
                 <a href="{% url 'reviews:product_reviews' product.pk %}" class="btn btn-outline-primary w-100">
-                    <i class="bi bi-eye"></i> Смотреть все отзывы ({{ product.reviews.filter|length }})
+                    <i class="bi bi-eye"></i> Смотреть все отзывы ({{ product.reviews_count }})
                 </a>
             </div>
         </div>
@@ -180,9 +210,13 @@
                 <div class="col-md-4 mb-3">
                     <div class="card h-100">
                         <div class="card-body">
-                            <div class="text-warning mb-2">
+                            <div class="rating mb-2">
                                 {% for i in "12345"|make_list %}
-                                    {% if forloop.counter <= review.rating %}★{% else %}☆{% endif %}
+                                    {% if forloop.counter <= review.rating %}
+                                        <i class="bi bi-star-fill" style="color: #ffc107;"></i>
+                                    {% else %}
+                                        <i class="bi bi-star" style="color: #dee2e6;"></i>
+                                    {% endif %}
                                 {% endfor %}
                             </div>
                             <p class="card-text">{{ review.text|truncatewords:20 }}</p>
@@ -233,4 +267,27 @@
     </div>
     {% endif %}
 </div>
+
+<style>
+
+    /* Стили для звезд */
+    .rating .bi-star-fill,
+    .rating .bi-star-half {
+        color: #ffc107 !important;
+    }
+
+    .rating .bi-star {
+        color: #dee2e6 !important;
+    }
+
+    body.dark-theme .rating .bi-star {
+        color: #6c757d !important;
+    }
+
+    body.dark-theme .rating .bi-star-fill,
+    body.dark-theme .rating .bi-star-half {
+        color: #ffc107 !important;
+    }
+</style>
+
 {% endblock %}

@@ -1,38 +1,52 @@
 {% if is_paginated %}
 <nav aria-label="Пагинация">
-    <ul class="pagination justify-content-center">
+    <ul style="display: flex; gap: 5px; list-style: none; justify-content: center; padding: 0; flex-wrap: wrap;">
+        <!-- Стрелка влево -->
         {% if page_obj.has_previous %}
-            <li class="page-item">
-                <a class="page-link" href="?page=1{% if query %}&q={{ query }}{% endif %}">&laquo; Первая</a>
-            </li>
-            <li class="page-item">
-                <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if query %}&q={{ query }}{% endif %}">Предыдущая</a>
+            <li>
+                <a href="?page={{ page_obj.previous_page_number }}{% if search_query %}&search={{ search_query }}{% endif %}{% if role %}&role={{ role }}{% endif %}"
+                   style="display: inline-block; padding: 6px 12px; border: 1px solid #ddd; border-radius: 4px; text-decoration: none; color: #555;">
+                    ←
+                </a>
             </li>
         {% else %}
-            <li class="page-item disabled"><span class="page-link">&laquo; Первая</span></li>
-            <li class="page-item disabled"><span class="page-link">Предыдущая</span></li>
+            <li>
+                <span style="display: inline-block; padding: 6px 12px; border: 1px solid #eee; border-radius: 4px; color: #ccc;">←</span>
+            </li>
         {% endif %}
-        
+
+        <!-- Все страницы подряд -->
         {% for num in page_obj.paginator.page_range %}
-            {% if page_obj.number == num %}
-                <li class="page-item active"><span class="page-link">{{ num }}</span></li>
-            {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
-                <li class="page-item">
-                    <a class="page-link" href="?page={{ num }}{% if query %}&q={{ query }}{% endif %}">{{ num }}</a>
+            {% if num == page_obj.number %}
+                <!-- Текущая страница -->
+                <li>
+                    <span style="display: inline-block; padding: 6px 12px; border: 1px solid #27ae60; border-radius: 4px; color: #27ae60; font-weight: bold;">
+                        {{ num }}
+                    </span>
+                </li>
+            {% else %}
+                <!-- Обычная страница -->
+                <li>
+                    <a href="?page={{ num }}{% if search_query %}&search={{ search_query }}{% endif %}{% if role %}&role={{ role }}{% endif %}"
+                       style="display: inline-block; padding: 6px 12px; border: 1px solid #ddd; border-radius: 4px; text-decoration: none; color: #555;">
+                        {{ num }}
+                    </a>
                 </li>
             {% endif %}
         {% endfor %}
-        
+
+        <!-- Стрелка вправо -->
         {% if page_obj.has_next %}
-            <li class="page-item">
-                <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if query %}&q={{ query }}{% endif %}">Следующая</a>
-            </li>
-            <li class="page-item">
-                <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}{% if query %}&q={{ query }}{% endif %}">Последняя &raquo;</a>
+            <li>
+                <a href="?page={{ page_obj.next_page_number }}{% if search_query %}&search={{ search_query }}{% endif %}{% if role %}&role={{ role }}{% endif %}"
+                   style="display: inline-block; padding: 6px 12px; border: 1px solid #ddd; border-radius: 4px; text-decoration: none; color: #555;">
+                    →
+                </a>
             </li>
         {% else %}
-            <li class="page-item disabled"><span class="page-link">Следующая</span></li>
-            <li class="page-item disabled"><span class="page-link">Последняя &raquo;</span></li>
+            <li>
+                <span style="display: inline-block; padding: 6px 12px; border: 1px solid #eee; border-radius: 4px; color: #ccc;">→</span>
+            </li>
         {% endif %}
     </ul>
 </nav>

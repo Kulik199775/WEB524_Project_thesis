@@ -20,4 +20,10 @@ urlpatterns = [
     path('admin/user/<int:pk>/edit/', views.UserEditView.as_view(), name='user_edit'),
     path('admin/user/<int:pk>/toggle-active/', views.UserToggleActiveView.as_view(), name='user_toggle_active'),
     path('admin/user/<int:pk>/delete/', views.UserDeleteView.as_view(), name='user_delete'),
+
+    # AJAX endpoints для входа/регистрации по коду
+    path('login/code/ajax/', views.LoginCodeAjaxView.as_view(), name='login_code_ajax'),
+    path('register/code/ajax/', views.RegisterCodeAjaxView.as_view(), name='register_code_ajax'),
+    path('verify/code/ajax/', views.VerifyCodeAjaxView.as_view(), name='verify_code_ajax'),
+    path('resend/code/ajax/', views.ResendCodeAjaxView.as_view(), name='resend_code_ajax'),
 ]

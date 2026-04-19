@@ -51,24 +51,3 @@ class Order(models.Model):
         self.total_price = total
         self.save()
         return total
-
-
-class OrderItem(models.Model):
-    """Товар в заказе"""
-
-    order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name='items', verbose_name='Заказ')
-    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='order_items', verbose_name='Товар')
-    quantity = models.PositiveIntegerField(default=1, validators=[MinValueValidator(1)], verbose_name='Количество')
-    price = models.DecimalField(max_digits=10, decimal_places=2, verbose_name='Цена на момент заказа')
-
-    class Meta:
-        db_table = 'order_items'
-        verbose_name = 'Товар в заказе'
-        verbose_name_plural = 'Товары в заказе'
-
-    def __str__(self):
-        return f'{self.product.name} x{self.quantity}'
-
-    def get_total_price(self):
-        """Общая стоимость позиции"""
-        return self.price * self.quantity

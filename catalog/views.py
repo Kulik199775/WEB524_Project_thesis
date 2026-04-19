@@ -3,32 +3,106 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse_lazy
 from django.contrib import messages
-from django.db.models import Q
+from django.db.models import Q, Avg, Count
 from django.core.paginator import Paginator
 from common.mixins import AdminRequiredMixin
-from .models import Product, Category, SkinType, Favorite
+from .models import Product, Category, SkinType, Favorite, Ingredient
 from .forms import ProductForm
 
 from cart.cart import Cart
 
 
 class ProductListView(ListView):
-    """Список товаров с пагинацией"""
+    """Список товаров с пагинацией и фильтрацией"""
     model = Product
     template_name = 'catalog/product_list.html'
     context_object_name = 'products'
-    paginate_by = 12  # 12 товаров на страницу
+    paginate_by = 6
 
     def get_queryset(self):
-        """Фильтрация по активным товарам"""
-        return Product.objects.filter(is_active=True)
+        queryset = Product.objects.filter(is_active=True)
+
+        # Фильтр по категории
+        category_slug = self.request.GET.get('category')
+        if category_slug:
+            queryset = queryset.filter(category__slug=category_slug)
+
+        # Фильтр по типу кожи
+        skin_type_slug = self.request.GET.get('skin_type')
+        if skin_type_slug:
+            queryset = queryset.filter(skin_types__slug=skin_type_slug)
+
+        # Фильтр по цене
+        price_min = self.request.GET.get('price_min')
+        if price_min:
+            queryset = queryset.filter(price__gte=price_min)
+
+        price_max = self.request.GET.get('price_max')
+        if price_max:
+            queryset = queryset.filter(price__lte=price_max)
+
+        # Фильтр по наличию
+        in_stock = self.request.GET.get('in_stock')
+        if in_stock == 'on' or in_stock == 'true':
+            queryset = queryset.filter(stock__gt=0)
+
+        # Фильтр по ингредиентам
+        ingredient_ids = self.request.GET.getlist('ingredients')
+        if ingredient_ids:
+            queryset = queryset.filter(ingredients__id__in=ingredient_ids).distinct()
+
+        # Фильтр по рейтингу
+        rating_min = self.request.GET.get('rating_min')
+        if rating_min:
+            queryset = queryset.annotate(
+                avg_rating=Avg('reviews__rating')
+            ).filter(avg_rating__gte=rating_min)
+
+        # Сортировка
+        sort_by = self.request.GET.get('sort', '-created_at')
+        valid_sorts = ['price', '-price', 'name', '-name', 'created_at', '-created_at']
+        if sort_by in valid_sorts:
+            queryset = queryset.order_by(sort_by)
+
+        return queryset
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['cart'] = Cart(self.request)
         context['categories'] = Category.objects.filter(is_active=True, parent__isnull=True)
         context['skin_types'] = SkinType.objects.all()
+        context['ingredients'] = Ingredient.objects.filter(is_natural=True)[:20]  # ← Теперь работает
         context['title'] = 'Каталог натуральной косметики'
+        context['cart'] = Cart(self.request)  # Если используете корзину
+
+        # Сохраняем параметры фильтрации для формы
+        context['current_filters'] = {
+            'category': self.request.GET.get('category', ''),
+            'skin_type': self.request.GET.get('skin_type', ''),
+            'price_min': self.request.GET.get('price_min', ''),
+            'price_max': self.request.GET.get('price_max', ''),
+            'in_stock': self.request.GET.get('in_stock', ''),
+            'rating_min': self.request.GET.get('rating_min', ''),
+            'sort': self.request.GET.get('sort', '-created_at'),
+        }
+
+        return context
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['categories'] = Category.objects.filter(is_active=True, parent__isnull=True)
+        context['skin_types'] = SkinType.objects.all()
+        context['ingredients'] = Ingredient.objects.filter(is_natural=True)[:20]
+        context['title'] = 'Каталог натуральной косметики'
+
+        # Сохраняем параметры фильтрации для формы
+        context['current_filters'] = {
+            'category': self.request.GET.get('category', ''),
+            'skin_type': self.request.GET.get('skin_type', ''),
+            'price_min': self.request.GET.get('price_min', ''),
+            'price_max': self.request.GET.get('price_max', ''),
+            'in_stock': self.request.GET.get('in_stock', ''),
+            'sort': self.request.GET.get('sort', '-created_at'),
+        }
 
         return context
 
@@ -145,6 +219,7 @@ class FavoriteListView(LoginRequiredMixin, ListView):
     template_name = 'catalog/favorites.html'
     context_object_name = 'favorites'
     paginate_by = 12
+    login_url = 'users:login'
 
     def get_queryset(self):
         return Favorite.objects.filter(user=self.request.user).select_related('product')
@@ -192,10 +267,7 @@ class SearchResultsView(ListView):
         query = self.request.GET.get('q', '')
         if query:
             return Product.objects.filter(
-                Q(name__icontains=query) |
-                Q(description__icontains=query) |
-                Q(category__name__icontains=query) |
-                Q(sku__icontains=query),
+                Q(name__icontains=query),
                 is_active=True
             ).distinct()
         return Product.objects.none()

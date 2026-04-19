@@ -37,23 +37,50 @@
                             <small class="text-muted">{{ stats.total_reviews }} оценок</small>
                         </div>
                         <div class="col-md-8">
-                            {% for rating in "54321"|make_list %}
                             <div class="d-flex align-items-center mb-1">
-                                <span class="me-2" style="width: 40px;">{{ rating }} ★</span>
+                                <span class="me-2" style="width: 40px;">5 ★</span>
                                 <div class="progress flex-grow-1" style="height: 20px;">
-                                    <div class="progress-bar bg-warning" 
-                                         style="width: {% widthratio stats|dictsort:rating|first rating stats.total_reviews %}%">
-                                    </div>
+                                    <div class="progress-bar bg-warning" style="width: {{ stats.rating_percentages.5 }}%;"></div>
                                 </div>
-                                <span class="ms-2">
-                                    {% widthratio stats|dictsort:rating|first rating stats.total_reviews %}%
-                                </span>
+                                <span class="ms-2" style="width: 45px;">{{ stats.rating_percentages.5 }}%</span>
+                                <span class="ms-2 text-muted small">({{ stats.rating_counts.5 }})</span>
                             </div>
-                            {% endfor %}
+                            <div class="d-flex align-items-center mb-1">
+                                <span class="me-2" style="width: 40px;">4 ★</span>
+                                <div class="progress flex-grow-1" style="height: 20px;">
+                                    <div class="progress-bar bg-warning" style="width: {{ stats.rating_percentages.4 }}%;"></div>
+                                </div>
+                                <span class="ms-2" style="width: 45px;">{{ stats.rating_percentages.4 }}%</span>
+                                <span class="ms-2 text-muted small">({{ stats.rating_counts.4 }})</span>
+                            </div>
+                            <div class="d-flex align-items-center mb-1">
+                                <span class="me-2" style="width: 40px;">3 ★</span>
+                                <div class="progress flex-grow-1" style="height: 20px;">
+                                    <div class="progress-bar bg-warning" style="width: {{ stats.rating_percentages.3 }}%;"></div>
+                                </div>
+                                <span class="ms-2" style="width: 45px;">{{ stats.rating_percentages.3 }}%</span>
+                                <span class="ms-2 text-muted small">({{ stats.rating_counts.3 }})</span>
+                            </div>
+                            <div class="d-flex align-items-center mb-1">
+                                <span class="me-2" style="width: 40px;">2 ★</span>
+                                <div class="progress flex-grow-1" style="height: 20px;">
+                                    <div class="progress-bar bg-warning" style="width: {{ stats.rating_percentages.2 }}%;"></div>
+                                </div>
+                                <span class="ms-2" style="width: 45px;">{{ stats.rating_percentages.2 }}%</span>
+                                <span class="ms-2 text-muted small">({{ stats.rating_counts.2 }})</span>
+                            </div>
+                            <div class="d-flex align-items-center mb-1">
+                                <span class="me-2" style="width: 40px;">1 ★</span>
+                                <div class="progress flex-grow-1" style="height: 20px;">
+                                    <div class="progress-bar bg-warning" style="width: {{ stats.rating_percentages.1 }}%;"></div>
+                                </div>
+                                <span class="ms-2" style="width: 45px;">{{ stats.rating_percentages.1 }}%</span>
+                                <span class="ms-2 text-muted small">({{ stats.rating_counts.1 }})</span>
+                            </div>
                         </div>
                     </div>
                     {% endif %}
-                    
+
                     <!-- Список отзывов -->
                     {% if reviews %}
                         {% for review in reviews %}
@@ -75,16 +102,6 @@
                                     <small class="text-muted">{{ review.created_at|date:"d.m.Y H:i" }}</small>
                                 </div>
                                 <p class="card-text mt-2">{{ review.text }}</p>
-                                
-                                <!-- Лайки -->
-                                <div class="mt-2">
-                                    <form method="post" action="{% url 'reviews:like' review.pk %}" class="d-inline">
-                                        {% csrf_token %}
-                                        <button type="submit" class="btn btn-sm btn-outline-danger">
-                                            <i class="bi bi-heart"></i> Полезно ({{ review.likes.count }})
-                                        </button>
-                                    </form>
-                                </div>
                             </div>
                         </div>
                         {% endfor %}

@@ -269,6 +269,28 @@
 </div>
 
 <style>
+    /* Sticky эффект для изображения */
+    .sticky-image {
+        position: sticky;
+        top: 80px; /* Отступ от верха (учитывая высоту navbar) */
+        transition: all 0.3s ease;
+        z-index: 10;
+    }
+
+    .sticky-image img {
+        width: 100%;
+        height: auto;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    /* Для мобильных устройств - отключаем sticky эффект */
+    @media (max-width: 768px) {
+        .sticky-image {
+            position: relative;
+            top: 0;
+            margin-bottom: 20px;
+        }
+    }
 
     /* Стили для звезд */
     .rating .bi-star-fill,

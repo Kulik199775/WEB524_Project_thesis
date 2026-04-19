@@ -96,32 +96,14 @@
                                             <a href="{% url 'users:user_edit' user.id %}" class="btn btn-outline-primary">
                                                 <i class="bi bi-pencil"></i>
                                             </a>
-                                            <button type="button" class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deleteModal{{ user.id }}">
-                                                <i class="bi bi-trash"></i>
-                                            </button>
-                                        </div>
-
-                                        <!-- Modal для подтверждения удаления -->
-                                        <div class="modal fade" id="deleteModal{{ user.id }}" tabindex="-1">
-                                            <div class="modal-dialog">
-                                                <div class="modal-content">
-                                                    <div class="modal-header">
-                                                        <h5 class="modal-title">Подтверждение удаления</h5>
-                                                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                                                    </div>
-                                                    <div class="modal-body">
-                                                        <p>Вы уверены, что хотите удалить пользователя <strong>{{ user.email }}</strong>?</p>
-                                                        <p class="text-danger">Это действие невозможно отменить!</p>
-                                                    </div>
-                                                    <div class="modal-footer">
-                                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
-                                                        <form method="post" action="{% url 'users:user_delete' user.id %}">
-                                                            {% csrf_token %}
-                                                            <button type="submit" class="btn btn-danger">Удалить</button>
-                                                        </form>
-                                                    </div>
-                                                </div>
-                                            </div>
+                                            <form method="post" action="{% url 'users:user_delete' user.id %}"
+                                                  onsubmit="return confirm('Вы уверены, что хотите удалить пользователя {{ user.email }}?{% if user.id == request.user.id %} ВНИМАНИЕ! Вы удаляете свой аккаунт!{% endif %}');"
+                                                  style="display: inline;">
+                                                {% csrf_token %}
+                                                <button type="submit" class="btn btn-outline-danger">
+                                                    <i class="bi bi-trash"></i>
+                                                </button>
+                                            </form>
                                         </div>
                                     </td>
                                 </tr>

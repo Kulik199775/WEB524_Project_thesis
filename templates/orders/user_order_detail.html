@@ -1,0 +1,95 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+<div class="container my-4">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'catalog:home' %}">Главная</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'orders:user_orders' %}">Мои заказы</a></li>
+            <li class="breadcrumb-item active">Заказ #{{ order.id }}</li>
+        </ol>
+    </nav>
+    
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card shadow">
+                <div class="card-header bg-success text-white">
+                    <h4 class="mb-0"><i class="bi bi-receipt"></i> Заказ #{{ order.id }}</h4>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Товар</th>
+                                    <th>Количество</th>
+                                    <th>Цена</th>
+                                    <th>Сумма</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for item in order.items.all %}
+                                <tr>
+                                    <td>{{ item.product.name }}</a></td>
+                                    <td>{{ item.quantity }}</a></td>
+                                    <td>{{ item.price }} ₽</a></td>
+                                    <td>{{ item.get_cost }} ₽</a></td>
+                                 </a>
+                                {% endfor %}
+                            </tbody>
+                            <tfoot class="table-light">
+                                <tr>
+                                    <td colspan="3" class="text-end"><strong>Итого:</strong></a></td>
+                                    <td><strong class="text-success">{{ order.get_total_cost }} ₽</strong></a></td>
+                                 </a>
+                            </tfoot>
+                        </table>
+                    </div>
+
+                    <!-- Кнопка оплаты -->
+                    {% if order.status == 'pending' %}
+                        <div class="text-center mt-3">
+                            <a href="{% url 'orders:repeat_payment' order.id %}" class="btn btn-success btn-lg">
+                                <i class="bi bi-credit-card"></i> Оплатить заказ
+                            </a>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-4">
+            <div class="card shadow">
+                <div class="card-header bg-secondary text-white">
+                    <h5 class="mb-0"><i class="bi bi-info-circle"></i> Информация</h5>
+                </div>
+                <div class="card-body">
+                    <p><strong>Дата заказа:</strong><br>{{ order.created_at|date:"d.m.Y H:i" }}</p>
+                    <p><strong>Статус:</strong><br>
+                        {% if order.status == 'paid' %}
+                            <span class="badge bg-success">✅ Оплачен</span>
+                        {% elif order.status == 'pending' %}
+                            <span class="badge bg-warning">⏳ Ожидает оплаты</span>
+                        {% elif order.status == 'cancelled' %}
+                            <span class="badge bg-danger">❌ Отменён</span>
+                        {% else %}
+                            <span class="badge bg-secondary">{{ order.status }}</span>
+                        {% endif %}
+                    </p>
+                    <hr>
+                    <h6>📦 Адрес доставки</h6>
+                    <p>{{ order.address }}</p>
+                    <h6>📞 Контактные данные</h6>
+                    <p>
+                        {{ order.first_name }} {{ order.last_name }}<br>
+                        {{ order.phone }}<br>
+                        {{ order.email }}
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

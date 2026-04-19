@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .header {
+            background: linear-gradient(135deg, #27ae60, #2ecc71);
+            padding: 20px;
+            text-align: center;
+            color: white;
+            border-radius: 10px 10px 0 0;
+        }
+        .content {
+            background: #f9f9f9;
+            padding: 20px;
+            border: 1px solid #ddd;
+        }
+        .footer {
+            background: #333;
+            padding: 15px;
+            text-align: center;
+            color: white;
+            font-size: 12px;
+            border-radius: 0 0 10px 10px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            padding: 10px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        .total {
+            font-size: 18px;
+            font-weight: bold;
+            text-align: right;
+        }
+        .success {
+            color: #27ae60;
+        }
+        .button {
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: #27ae60;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🌿 Kasmia</h1>
+            <p>Натуральная косметика</p>
+        </div>
+
+        <div class="content">
+            <h2>Здравствуйте, {{ order.first_name }} {{ order.last_name }}!</h2>
+
+            <p>Спасибо за ваш заказ! Мы получили его и уже начали обработку.</p>
+
+            <h3>✅ Детали заказа #{{ order.id }}</h3>
+
+            <table>
+                <thead>
+                    <tr style="background-color: #f0f0f0;">
+                        <th>Товар</th>
+                        <th>Количество</th>
+                        <th>Цена</th>
+                        <th>Сумма</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in items %}
+                    <tr>
+                        <td>{{ item.product.name }}</td>
+                        <td>{{ item.quantity }}</td>
+                        <td>{{ item.price }} ₽</td>
+                        <td>{{ item.get_cost }} ₽</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+
+            <div class="total">
+                <p>Итого к оплате: <span class="success">{{ total }} ₽</span></p>
+            </div>
+
+            <hr>
+
+            <h4>📦 Информация о доставке</h4>
+            <p>
+                <strong>Получатель:</strong> {{ order.first_name }} {{ order.last_name }}<br>
+                <strong>Телефон:</strong> {{ order.phone }}<br>
+                <strong>Адрес:</strong> {{ order.address }}
+            </p>
+
+            <p>Статус заказа: <strong>
+                {% if order.status == 'paid' %}✅ Оплачен
+                {% else %}⏳ Ожидает оплаты
+                {% endif %}
+            </strong></p>
+
+            <div style="text-align: center; margin: 30px 0;">
+                <a href="{{ site_url }}/" class="button">Перейти в каталог</a>
+            </div>
+
+            <p>Если у вас есть вопросы, свяжитесь с нами: <strong>info@kasmia.ru</strong></p>
+        </div>
+
+        <div class="footer">
+            <p>© 2026 Kasmia - Натуральная косметика</p>
+            <p>Только натуральные ингредиенты. Забота о вашей коже и природе.</p>
+        </div>
+    </div>
+</body>
+</html>

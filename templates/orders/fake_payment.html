@@ -1,0 +1,59 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+<div class="container my-4">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card shadow">
+                <div class="card-header bg-warning">
+                    <h4 class="mb-0"><i class="bi bi-credit-card"></i> Оплата товара </h4>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-info">
+                        <i class="bi bi-info-circle"></i> После ввода данных, убедитесь в их правильности.
+                    </div>
+                    
+                    <p><strong>Заказ #{{ order.id }}</strong></p>
+                    <p><strong>Сумма к оплате:</strong> {{ order.get_total_cost }} ₽</p>
+                    
+                    <form method="post" action="{% url 'orders:process_fake_payment' order.id %}">
+                        {% csrf_token %}
+                        
+                        <div class="mb-3">
+                            <label class="form-label">Номер карты</label>
+                            <input type="text" class="form-control" name="card_number" placeholder="4242 4242 4242 4242" required>
+                            <small class="text-muted">Для теста введите любые 16 цифр</small>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Срок действия</label>
+                                <input type="text" class="form-control" name="expiry" placeholder="12/28" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">CVV</label>
+                                <input type="text" class="form-control" name="cvv" placeholder="123" required>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label">Владелец карты</label>
+                            <input type="text" class="form-control" name="card_holder" placeholder="IVAN IVANOV" required>
+                        </div>
+                        
+                        <button type="submit" class="btn btn-success w-100">
+                            <i class="bi bi-check-lg"></i> Оплатить {{ order.get_total_cost }} ₽
+                        </button>
+
+                        <a href="{% url 'orders:user_order_detail' order.id %}" class="btn btn-outline-secondary w-100 mt-2">
+                            <i class="bi bi-arrow-left"></i> Вернуться к заказу
+                        </a>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

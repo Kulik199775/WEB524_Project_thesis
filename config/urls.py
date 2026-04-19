@@ -19,11 +19,20 @@ from django.contrib import admin
 from django.urls import path, include
 
 from django.conf.urls.static import static
+from django.views.generic import TemplateView, RedirectView
 
 urlpatterns = [
+                  path('accounts/login/', RedirectView.as_view(url='/users/login/', permanent=True)),
+                  path('accounts/', include('django.contrib.auth.urls')),
+
                   path("admin/", admin.site.urls),
                   path('', include('catalog.urls', namespace='catalog')),
                   path('users/', include('users.urls')),
                   path('cart/', include('cart.urls')),
                   path('reviews/', include('reviews.urls')),
+                  path('orders/', include('orders.urls')),
+                  path('privacy-policy/', TemplateView.as_view(template_name='pages/privacy_policy.html'),
+                       name='privacy_policy'),
+                  path('delivery/', TemplateView.as_view(template_name='pages/delivery.html'), name='delivery'),
+                  path('about/', TemplateView.as_view(template_name='pages/about.html'), name='about')
               ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

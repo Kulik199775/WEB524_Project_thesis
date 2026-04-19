@@ -1,0 +1,124 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Kasmia|О нас{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'catalog:home' %}">Главная</a></li>
+            <li class="breadcrumb-item active">О нас</li>
+        </ol>
+    </nav>
+    
+    <div class="row">
+        <div class="col-12 text-center mb-5">
+            <h1 class="display-4">О компании Kasmia</h1>
+            <p class="lead">Натуральная косметика для заботы о вашей коже</p>
+        </div>
+    </div>
+    
+    <div class="row mb-5">
+        <div class="col-md-6">
+            <div class="bg-secondary text-white text-center py-5 rounded">
+                <i class="bi bi-building" style="font-size: 5rem;"></i>
+                <p>Наш офис</p>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <h3>Наша история</h3>
+            <p>Kasmia была основана в 2022 году с одной простой целью — создавать натуральную косметику, которая действительно работает и заботится о вашей коже.</p>
+            <p>Мы верим, что красота начинается с здоровья, а здоровье кожи — это результат использования качественных, натуральных ингредиентов.</p>
+            <p>Все наши продукты разработаны совместно с косметологами и дерматологами, чтобы обеспечить максимальную эффективность и безопасность.</p>
+        </div>
+    </div>
+    
+    <div class="row mb-5">
+        <div class="col-12">
+            <h3 class="text-center mb-4">Наши принципы</h3>
+        </div>
+        
+        <div class="col-md-4 mb-3">
+            <div class="card shadow h-100 text-center">
+                <div class="card-body">
+                    <i class="bi bi-flower1" style="font-size: 3rem; color: #27ae60;"></i>
+                    <h5 class="mt-3">Только натуральное</h5>
+                    <p class="text-muted">Мы используем только натуральные ингредиенты, без парабенов, силиконов и искусственных красителей</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-4 mb-3">
+            <div class="card shadow h-100 text-center">
+                <div class="card-body">
+                    <i class="bi bi-recycle" style="font-size: 3rem; color: #27ae60;"></i>
+                    <h5 class="mt-3">Экологичность</h5>
+                    <p class="text-muted">Заботимся об окружающей среде: используем биоразлагаемую упаковку</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-4 mb-3">
+            <div class="card shadow h-100 text-center">
+                <div class="card-body">
+                    <i class="bi bi-heart" style="font-size: 3rem; color: #27ae60;"></i>
+                    <h5 class="mt-3">Без жестокости</h5>
+                    <p class="text-muted">Не тестируем на животных. Мы за гуманную косметику</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="row mb-5">
+        <div class="col-12">
+            <h3 class="text-center mb-4">Почему выбирают Kasmia?</h3>
+        </div>
+        
+        <div class="col-md-3 mb-3">
+            <div class="text-center">
+                <h2 class="text-success">100%</h2>
+                <p>Натуральных ингредиентов</p>
+            </div>
+        </div>
+        
+        <div class="col-md-3 mb-3">
+            <div class="text-center">
+                <h2 class="text-success">50+</h2>
+                <p>Продуктов в линейке</p>
+            </div>
+        </div>
+        
+        <div class="col-md-3 mb-3">
+            <div class="text-center">
+                <h2 class="text-success">1000+</h2>
+                <p>Довольных клиентов</p>
+            </div>
+        </div>
+        
+        <div class="col-md-3 mb-3">
+            <div class="text-center">
+                <h2 class="text-success">24/7</h2>
+                <p>Поддержка клиентов</p>
+            </div>
+        </div>
+    </div>
+    
+    <div class="row">
+        <div class="col-12">
+            <div class="card bg-success text-white text-center p-5">
+                <h3>Присоединяйтесь к нам!</h3>
+                <p class="lead">Подпишитесь на нашу рассылку и получайте скидки и новости первыми</p>
+                <div class="row justify-content-center">
+                    <div class="col-md-6">
+                        <form class="d-flex">
+                            <input type="email" class="form-control me-2" placeholder="Ваш email">
+                            <button class="btn btn-light text-success" type="submit">Подписаться</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

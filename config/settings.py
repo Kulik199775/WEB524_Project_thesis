@@ -27,7 +27,7 @@ SECRET_KEY = "django-insecure-vwacrg_j@8yjh6!n%dfwsu6=s_(p)^+nbd9ymi&%+-+16j*4f8
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 # Application definition
 
@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     'common',
     'cart',
     'reviews',
+    'orders',
 ]
 
 MIDDLEWARE = [
@@ -149,6 +150,7 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/6.0/howto/static-files/
 
+SITE_URL = 'http://127.0.0.1:8000'
 STATIC_URL = "/static/"
 STATICFILES_DIRS = [BASE_DIR / 'static']
 STATIC_ROOT = BASE_DIR / "staticfiles"
@@ -175,14 +177,26 @@ AUTH_USER_MODEL = 'users.User'
 #     }
 #
 #
-# EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
-# EMAIL_HOST = 'smtp.yandex.com'
-# EMAIL_PORT = 465
-# EMAIL_HOST_USER = os.getenv("EMAIL_HOST_USER")
-# EMAIL_HOST_PASSWORD = os.getenv("YANDEX_PASSWORD_APP")
-# EMAIL_USE_TLS = False
-# EMAIL_USE_SSL = True
-#
-# EMAIL_SERVER = EMAIL_HOST_USER
-# DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
-# EMAIL_ADMIN = EMAIL_HOST_USER
+
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+        'LOCATION': 'unique-snowflake',
+    }
+}
+
+EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+EMAIL_HOST = 'smtp.yandex.com'
+EMAIL_PORT = 465
+EMAIL_HOST_USER = os.getenv("EMAIL_HOST_USER")
+EMAIL_HOST_PASSWORD = os.getenv("YANDEX_PASSWORD_APP")
+EMAIL_USE_TLS = False
+EMAIL_USE_SSL = True
+
+EMAIL_SERVER = EMAIL_HOST_USER
+DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
+EMAIL_ADMIN = EMAIL_HOST_USER
+
+VERIFICATION_CODE_EXPIRY_MINUTES = 10  # Время жизни кода (10 минут)
+VERIFICATION_CODE_LENGTH = 6 # Длина кода
+

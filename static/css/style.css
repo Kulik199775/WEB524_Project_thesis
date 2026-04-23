@@ -1,0 +1,1237 @@
+/* Простые и красивые стили */
+.navbar {
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.navbar-brand {
+    font-weight: bold;
+    font-size: 1.3rem;
+    color: rgba(0, 0, 0, 1) !important;
+}
+
+/* Фиксированная ширина для всех кнопок навигации */
+.navbar-nav .nav-link {
+    color: rgba(0, 0, 0, 1) !important;
+    font-weight: 500;
+    transition: all 0.3s;
+    padding: 8px 16px !important;
+    margin: 0 2px !important;
+    white-space: nowrap;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.cart-item .nav-link {
+    padding: 10px 20px !important;
+}
+
+/* Фиксированная ширина для иконок */
+.navbar-nav .nav-link i {
+    width: 20px;
+    font-size: 1.1rem;
+    display: inline-block;
+    text-align: center;
+}
+
+.navbar-nav .nav-link:hover {
+    color: #2c5f2d !important;
+    transform: translateY(-2px);
+    background-color: rgba(39, 174, 96, 0.05);
+    border-radius: 8px;
+}
+
+
+/* Стили для мобильных */
+@media (max-width: 992px) {
+    .navbar-nav {
+        margin-top: 20px;
+        width: 100%;
+    }
+
+    .navbar-nav .nav-link {
+        padding: 12px 16px !important;
+        margin: 5px 0 !important;
+        white-space: normal;
+        justify-content: flex-start;
+    }
+
+    .navbar-nav .nav-link i {
+        width: 25px;
+    }
+}
+
+/* Кнопка поиска */
+.search-btn {
+    background-color: #27ae60;
+    color: white;
+    border: none;
+    border-radius: 0 4px 4px 0;
+}
+
+.search-btn:hover {
+    background-color: #1E8C52FF;
+}
+
+.search-input {
+    border-radius: 4px 0 0 4px;
+    border-right: none;
+}
+
+/* Выпадающее меню */
+.simple-dropdown {
+    position: relative;
+}
+
+.simple-dropdown-menu {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    background: white;
+    min-width: 220px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    padding: 10px 0;
+    z-index: 1000;
+    margin-top: 5px;
+}
+
+/* Показываем при наведении на кнопку ИЛИ на само меню */
+.simple-dropdown:hover .simple-dropdown-menu,
+.simple-dropdown-menu:hover {
+    display: block;
+}
+
+/* Невидимый мостик между кнопкой и меню */
+.simple-dropdown > a::after {
+    content: '';
+    position: absolute;
+    bottom: -10px;
+    left: 0;
+    right: 0;
+    height: 10px;
+    background: transparent;
+}
+
+/* Для правого меню (аккаунт) */
+@media (min-width: 992px) {
+    .simple-dropdown:last-child .simple-dropdown-menu {
+        left: auto;
+        right: 0;
+    }
+}
+
+.simple-dropdown-menu a {
+    display: block;
+    padding: 8px 20px;
+    color: #555;
+    text-decoration: none;
+    transition: all 0.3s;
+}
+
+.simple-dropdown-menu a:hover {
+    background-color: #f5f5f5;
+    color: #27ae60;
+    padding-left: 25px;
+}
+
+.simple-dropdown-menu button {
+    display: block;
+    width: 100%;
+    text-align: left;
+    padding: 8px 20px;
+    background: none;
+    border: none;
+    color: #dc3545;
+    cursor: pointer;
+}
+
+.simple-dropdown-menu button:hover {
+    background-color: #f5f5f5;
+}
+
+/* Фикс для выпадающих меню на десктопе */
+@media (min-width: 992px) {
+    .simple-dropdown-menu {
+        left: auto;
+        right: 0;
+    }
+}
+
+/* Кнопка "Наверх" */
+.back-to-top {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    background-color: #209150;
+    color: white;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-decoration: none;
+    font-size: 30px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+}
+
+.back-to-top.visible {
+    opacity: 1;
+    visibility: visible;
+}
+
+.back-to-top:hover {
+    background-color: #27ae60;
+    transform: translateY(-3px);
+}
+
+
+/* Анимация появления кнопки */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px) scale(0.8);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+@keyframes pulse {
+    0% {
+        transform: scale(1);
+        opacity: 0.4;
+    }
+    70% {
+        transform: scale(1.3);
+        opacity: 0;
+    }
+    100% {
+        transform: scale(1.3);
+        opacity: 0;
+    }
+}
+
+
+/* Плавное появление кнопок */
+.nav-link {
+    transition: all 0.2s ease;
+}
+
+.nav-link:hover {
+    transform: translateX(5px);
+}
+
+/* Анимация для navbar при скролле */
+.navbar {
+    transition: box-shadow 0.3s ease;
+}
+
+.navbar.scrolled {
+    box-shadow: 0 2px 20px rgba(0, 0, 0, 0.1);
+}
+
+/* Анимация для карточек товаров */
+.card {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+}
+
+/* Стили для рейтинга */
+.rating {
+    display: inline-flex;
+    align-items: center;
+    gap: 2px;
+}
+
+.rating i {
+    font-size: 14px;
+    transition: all 0.2s;
+}
+
+/* Анимация звезд при наведении на карточку */
+.card:hover .rating i {
+    animation: starPulse 0.3s ease;
+}
+
+@keyframes starPulse {
+    0% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.2);
+    }
+    100% {
+        transform: scale(1);
+    }
+}
+
+/* Крупные звезды для детальной страницы */
+.rating-large i {
+    font-size: 20px;
+}
+
+/* Цвета для звезд */
+.text-warning {
+    color: #ffc107 !important;
+}
+
+/* Темная тема */
+body.dark-theme {
+    background-color: #121212;
+    color: #e0e0e0;
+}
+
+body.dark-theme .navbar {
+    background-color: #1e1e1e !important;
+}
+
+body.dark-theme .navbar-brand,
+body.dark-theme .navbar-nav .nav-link {
+    color: #e0e0e0 !important;
+}
+
+body.dark-theme .card {
+    background-color: #1e1e1e;
+}
+
+body.dark-theme .simple-dropdown-menu {
+    background-color: #1e1e1e;
+}
+
+body.dark-theme .simple-dropdown-menu a {
+    color: #e0e0e0;
+}
+
+/* Темная тема - дополнительные стили */
+body.dark-theme {
+    background-color: #121212;
+    color: #e0e0e0;
+}
+
+body.dark-theme .navbar {
+    background-color: #1e1e1e !important;
+}
+
+body.dark-theme .navbar-brand,
+body.dark-theme .navbar-nav .nav-link {
+    color: #e0e0e0 !important;
+}
+
+/* Карточки товаров */
+body.dark-theme .card {
+    background-color: #1e1e1e;
+    border-color: #2d2d2d;
+}
+
+body.dark-theme .card-body {
+    background-color: #1e1e1e;
+    color: #e0e0e0;
+}
+
+body.dark-theme .card-title {
+    color: #e0e0e0;
+}
+
+body.dark-theme .card-text {
+    color: #a0a0a0;
+}
+
+body.dark-theme .card-footer {
+    background-color: #252525;
+    border-top-color: #2d2d2d;
+}
+
+/* Кнопки */
+body.dark-theme .btn-outline-primary {
+    border-color: #27ae60;
+    color: #27ae60;
+}
+
+body.dark-theme .btn-outline-primary:hover {
+    background-color: #27ae60;
+    color: #121212;
+}
+
+body.dark-theme .btn-success {
+    background-color: #27ae60;
+    border-color: #27ae60;
+}
+
+body.dark-theme .btn-success:hover {
+    background-color: #2ecc71;
+}
+
+/* Фильтры (меню типов кожи) */
+body.dark-theme .list-group-item {
+    background-color: #1e1e1e;
+    color: #e0e0e0;
+    border-color: #2d2d2d;
+}
+
+body.dark-theme .list-group-item:hover {
+    background-color: #2d2d2d;
+    color: #27ae60;
+}
+
+body.dark-theme .list-group-item-action {
+    color: #e0e0e0;
+}
+
+/* Карточка фильтров */
+body.dark-theme .card-header.bg-success {
+    background-color: #27ae60 !important;
+}
+
+body.dark-theme .card-header.bg-success h5 {
+    color: #121212;
+}
+
+/* Цены */
+body.dark-theme .text-success,
+body.dark-theme .h5.text-success,
+body.dark-theme .price {
+    color: #27ae60 !important;
+}
+
+/* Badge "В наличии" */
+body.dark-theme .badge.bg-success {
+    background-color: #27ae60 !important;
+    color: #121212;
+}
+
+/* Форма поиска */
+body.dark-theme .form-control,
+body.dark-theme .search-input {
+    background-color: #2d2d2d;
+    border-color: #3d3d3d;
+    color: #e0e0e0;
+}
+
+body.dark-theme .form-control::placeholder,
+body.dark-theme .search-input::placeholder {
+    color: #888;
+}
+
+body.dark-theme .form-control:focus,
+body.dark-theme .search-input:focus {
+    background-color: #2d2d2d;
+    color: #e0e0e0;
+}
+
+/* Выпадающие меню */
+body.dark-theme .simple-dropdown-menu {
+    background-color: #1e1e1e;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+}
+
+body.dark-theme .simple-dropdown-menu a {
+    color: #e0e0e0;
+}
+
+body.dark-theme .simple-dropdown-menu a:hover {
+    background-color: #2d2d2d;
+    color: #27ae60;
+}
+
+/* Пагинация */
+body.dark-theme .page-link {
+    background-color: #1e1e1e;
+    color: #e0e0e0;
+    border-color: #2d2d2d;
+}
+
+body.dark-theme .page-link:hover {
+    background-color: #2d2d2d;
+    color: #27ae60;
+}
+
+body.dark-theme .page-item.active .page-link {
+    background-color: #27ae60;
+    border-color: #27ae60;
+    color: #121212;
+}
+
+/* Alert сообщения */
+body.dark-theme .alert-success {
+    background-color: #1a3a2a;
+    color: #27ae60;
+    border: none;
+}
+
+body.dark-theme .alert-danger {
+    background-color: #3a1a1a;
+    color: #e74c3c;
+    border: none;
+}
+
+/* Кнопка "Наверх" */
+body.dark-theme .back-to-top {
+    background-color: #27ae60;
+}
+
+body.dark-theme .back-to-top:hover {
+    background-color: #2ecc71;
+}
+
+/* Текст на карточках */
+body.dark-theme .card-text.text-muted {
+    color: #a0a0a0 !important;
+}
+
+/* Разделители */
+body.dark-theme hr {
+    border-color: #2d2d2d;
+}
+
+
+body.dark-theme .btn-outline-primary,
+body.dark-theme .btn-outline-primary:link,
+body.dark-theme .btn-outline-primary:visited {
+    background-color: transparent !important;
+    border-color: #27ae60 !important;
+    color: #27ae60 !important;
+}
+
+body.dark-theme .btn-outline-primary:hover,
+body.dark-theme .btn-outline-primary:active,
+body.dark-theme .btn-outline-primary:focus {
+    background-color: #27ae60 !important;
+    color: #121212 !important;
+    border-color: #27ae60 !important;
+}
+
+body.dark-theme .btn-success,
+body.dark-theme .btn-success:link,
+body.dark-theme .btn-success:visited {
+    background-color: #27ae60 !important;
+    color: #121212 !important;
+    border: none !important;
+}
+
+body.dark-theme .btn-success:hover,
+body.dark-theme .btn-success:active,
+body.dark-theme .btn-success:focus {
+    background-color: #2ecc71 !important;
+    color: #121212 !important;
+}
+
+/* Фон карточек */
+body.dark-theme .card {
+    background-color: #1e1e1e !important;
+}
+
+body.dark-theme .card-footer {
+    background-color: #252525 !important;
+}
+
+body.dark-theme .rating i {
+    color: #ffc107 !important; /* Желтые звезды */
+}
+
+body.dark-theme .rating .bi-star {
+    color: #555 !important; /* Пустые звезды - серые, но видимые */
+}
+
+body.dark-theme .text-warning {
+    color: #ffc107 !important;
+}
+
+/* Для пустых звезд (без оценки) */
+body.dark-theme .rating i.bi-star {
+    color: #6c757d !important; /* Светло-серые, видимые на темном фоне */
+}
+
+/* Если используете обычные звезды (не иконки Bootstrap) */
+body.dark-theme .rating .star-empty {
+    color: #6c757d;
+}
+
+body.dark-theme .rating .star-full {
+    color: #ffc107;
+}
+
+/* Для текста "Нет отзывов" */
+body.dark-theme .rating .text-muted {
+    color: #a0a0a0 !important;
+}
+
+body.dark-theme .rating .small {
+    color: #c0c0c0 !important;
+}
+
+/* Темная тема для модальных окон */
+body.dark-theme .modal-content {
+    background-color: #1e1e1e;
+    border: 1px solid #2d2d2d;
+}
+
+body.dark-theme .modal-header {
+    border-bottom-color: #2d2d2d;
+}
+
+body.dark-theme .modal-footer {
+    border-top-color: #2d2d2d;
+}
+
+body.dark-theme .modal-body label {
+    color: #e0e0e0;
+}
+
+body.dark-theme .table {
+    background-color: #1e1e1e;
+    color: #e0e0e0;
+}
+
+/* Шапка таблицы */
+body.dark-theme .table thead th,
+body.dark-theme .table thead td,
+body.dark-theme .table-light thead th,
+body.dark-theme .table-light {
+    background-color: #2a2a2a !important;
+    color: #e0e0e0 !important;
+    border-bottom-color: #3d3d3d;
+}
+
+/* Ячейки таблицы */
+body.dark-theme .table td,
+body.dark-theme .table th {
+    background-color: #1e1e1e;
+    color: #e0e0e0;
+    border-top-color: #3d3d3d;
+    border-bottom-color: #3d3d3d;
+}
+
+/* Строки таблицы при наведении */
+body.dark-theme .table tbody tr:hover td,
+body.dark-theme .table tbody tr:hover th {
+    background-color: #2a2a2a;
+}
+
+/* Границы таблицы */
+body.dark-theme .table-bordered,
+body.dark-theme .table-bordered td,
+body.dark-theme .table-bordered th {
+    border-color: #3d3d3d;
+}
+
+/* Текст в ячейках */
+body.dark-theme .table td,
+body.dark-theme .table th,
+body.dark-theme .table .text-muted {
+    color: #e0e0e0;
+}
+
+/* Цена и сумма */
+body.dark-theme .table .text-success {
+    color: #27ae60 !important;
+}
+
+/* Кнопки внутри таблицы */
+body.dark-theme .table .btn-sm {
+    background-color: #2d2d2d;
+    border-color: #3d3d3d;
+    color: #e0e0e0;
+}
+
+body.dark-theme .table .btn-sm:hover {
+    background-color: #3d3d3d;
+    color: #27ae60;
+}
+
+/* Итого в корзине */
+body.dark-theme .table tfoot td,
+body.dark-theme .table tfoot th {
+    background-color: #2a2a2a;
+    color: #e0e0e0;
+    font-weight: bold;
+}
+
+/* Карточка корзины */
+body.dark-theme .card {
+    background-color: #1e1e1e;
+    border-color: #2d2d2d;
+}
+
+body.dark-theme .card-header {
+    background-color: #27ae60 !important;
+    border-bottom-color: #2d2d2d;
+}
+
+body.dark-theme .card-header h4 {
+    color: #121212;
+}
+
+body.dark-theme .card-body {
+    background-color: #1e1e1e;
+}
+
+/* Темная тема для таблицы заказов */
+body.dark-theme .table {
+    color: #e0e0e0;
+}
+
+body.dark-theme .table-light {
+    background-color: #2a2a2a !important;
+}
+
+body.dark-theme .table-light th,
+body.dark-theme .table-light td {
+    background-color: #2a2a2a !important;
+    color: #e0e0e0;
+    border-color: #3d3d3d;
+}
+
+body.dark-theme .table tbody tr {
+    background-color: #1e1e1e;
+}
+
+body.dark-theme .table tbody tr:hover {
+    background-color: #2a2a2a;
+}
+
+body.dark-theme .table td,
+body.dark-theme .table th {
+    border-top-color: #3d3d3d;
+}
+
+/* Badge статусов заказа */
+body.dark-theme .badge.bg-warning {
+    background-color: #f39c12 !important;
+    color: #121212;
+}
+
+body.dark-theme .badge.bg-success {
+    background-color: #27ae60 !important;
+    color: #121212;
+}
+
+body.dark-theme .badge.bg-danger {
+    background-color: #dc3545 !important;
+    color: white;
+}
+
+body.dark-theme .badge.bg-secondary {
+    background-color: #555 !important;
+    color: #e0e0e0;
+}
+
+/* Карточка деталей заказа */
+body.dark-theme .card-header.bg-secondary {
+    background-color: #27ae60 !important;
+}
+
+body.dark-theme .card-header.bg-secondary h5 {
+    color: #121212;
+}
+
+body.dark-theme .breadcrumb-item a {
+    color: #27ae60;
+}
+
+body.dark-theme .breadcrumb-item.active {
+    color: #a0a0a0;
+}
+
+body.dark-theme .breadcrumb-item::before {
+    color: #a0a0a0;
+}
+
+/* Темная тема для форм и полей ввода */
+body.dark-theme .form-control,
+body.dark-theme .form-select,
+body.dark-theme input.form-control,
+body.dark-theme textarea.form-control,
+body.dark-theme select.form-select {
+    background-color: #2d2d2d !important;
+    border-color: #3d3d3d !important;
+    color: #e0e0e0 !important;
+}
+
+body.dark-theme .form-control::placeholder,
+body.dark-theme input::placeholder,
+body.dark-theme textarea::placeholder {
+    color: #888 !important;
+}
+
+body.dark-theme .form-control:focus,
+body.dark-theme .form-select:focus,
+body.dark-theme input:focus,
+body.dark-theme textarea:focus {
+    background-color: #2d2d2d !important;
+    border-color: #27ae60 !important;
+    color: #e0e0e0 !important;
+    box-shadow: 0 0 0 0.2rem rgba(39, 174, 96, 0.25) !important;
+}
+
+/* Темная тема для меток (labels) */
+body.dark-theme .form-label,
+body.dark-theme label {
+    color: #e0e0e0 !important;
+}
+
+/* Темная тема для модальных окон */
+body.dark-theme .modal-content {
+    background-color: #1e1e1e !important;
+    border-color: #2d2d2d !important;
+}
+
+body.dark-theme .modal-header {
+    border-bottom-color: #2d2d2d !important;
+}
+
+body.dark-theme .modal-footer {
+    border-top-color: #2d2d2d !important;
+}
+
+body.dark-theme .modal-body {
+    background-color: #1e1e1e !important;
+    color: #e0e0e0 !important;
+}
+
+/* Темная тема для текста в модальных окнах */
+body.dark-theme .modal-body .text-muted {
+    color: #a0a0a0 !important;
+}
+
+body.dark-theme .modal-body p {
+    color: #e0e0e0 !important;
+}
+
+/* Темная тема для ссылок в модальных окнах */
+body.dark-theme .modal-footer a,
+body.dark-theme .modal-body a {
+    color: #27ae60 !important;
+}
+
+body.dark-theme .modal-footer a:hover,
+body.dark-theme .modal-body a:hover {
+    color: #2ecc71 !important;
+}
+
+/* Темная тема для кнопки закрытия в модальном окне */
+body.dark-theme .btn-close {
+    filter: invert(1) !important;
+}
+
+/* Темная тема для alert сообщений */
+body.dark-theme .alert-success {
+    background-color: #1a3a2a !important;
+    border-color: #27ae60 !important;
+    color: #27ae60 !important;
+}
+
+body.dark-theme .alert-danger {
+    background-color: #3a1a1a !important;
+    border-color: #dc3545 !important;
+    color: #e74c3c !important;
+}
+
+body.dark-theme .alert-warning {
+    background-color: #3a2a1a !important;
+    border-color: #f39c12 !important;
+    color: #f39c12 !important;
+}
+
+body.dark-theme .alert-info {
+    background-color: #1a2a3a !important;
+    border-color: #0dcaf0 !important;
+    color: #0dcaf0 !important;
+}
+
+/* Темная тема для текста в alert */
+body.dark-theme .alert i,
+body.dark-theme .alert strong {
+    color: inherit !important;
+}
+
+/* Темная тема для кнопок в alert */
+body.dark-theme .alert .btn-close {
+    filter: invert(1) !important;
+}
+
+/* Темная тема для фона светлых элементов */
+body.dark-theme .bg-light {
+    background-color: #2d2d2d !important;
+}
+
+/* Темная тема для границ */
+body.dark-theme .border,
+body.dark-theme .border-top,
+body.dark-theme .border-bottom,
+body.dark-theme .border-start,
+body.dark-theme .border-end {
+    border-color: #3d3d3d !important;
+}
+
+/* Темная тема для кнопок (общие стили) */
+body.dark-theme .btn-outline-primary {
+    border-color: #27ae60 !important;
+    color: #27ae60 !important;
+}
+
+body.dark-theme .btn-outline-primary:hover {
+    background-color: #27ae60 !important;
+    color: #121212 !important;
+}
+
+body.dark-theme .btn-success {
+    background-color: #27ae60 !important;
+    border-color: #27ae60 !important;
+    color: #121212 !important;
+}
+
+body.dark-theme .btn-success:hover {
+    background-color: #2ecc71 !important;
+}
+
+body.dark-theme .btn-secondary {
+    background-color: #3d3d3d !important;
+    border-color: #4d4d4d !important;
+    color: #e0e0e0 !important;
+}
+
+/* Темная тема для текста */
+body.dark-theme .text-dark {
+    color: #e0e0e0 !important;
+}
+
+body.dark-theme .text-muted {
+    color: #a0a0a0 !important;
+}
+
+/* Темная тема для ссылок */
+body.dark-theme a:not(.btn):not(.nav-link):not(.back-to-top) {
+    color: #27ae60 !important;
+}
+
+body.dark-theme a:not(.btn):not(.nav-link):not(.back-to-top):hover {
+    color: #2ecc71 !important;
+}
+
+.position-relative {
+    position: relative;
+}
+
+/* Позиционирование для корзины */
+.cart-item {
+    position: relative;
+}
+
+.cart-item .nav-link {
+    padding-right: 5px !important;
+}
+
+.cart-badge-absolute {
+    position: absolute;
+    top: 5px;
+    right: -8px;
+    background-color: #ff6b6b;
+    color: white;
+    border-radius: 50%;
+    width: 18px;
+    height: 18px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    font-weight: bold;
+    line-height: 1;
+}
+
+/* Для темной темы */
+body.dark-theme .cart-badge-absolute {
+    background-color: #dc3545;
+    color: white;
+}
+
+/* Анимации для уведомлений */
+@keyframes slideInRight {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+@keyframes slideOutRight {
+    from {
+        transform: translateX(0);
+        opacity: 1;
+    }
+    to {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+}
+
+.notification-container {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    z-index: 1050;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+@media (max-width: 768px) {
+    .notification-container {
+        bottom: 20px;
+        right: 20px;
+        left: 20px;
+    }
+
+    .notification {
+        width: calc(100% - 40px);
+        min-width: auto;
+        max-width: none;
+    }
+}
+
+/* Анимация */
+@keyframes bounce {
+    0%, 100% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.2);
+    }
+}
+
+.cart-badge-absolute {
+    transition: background-color 0.3s, transform 0s !important;
+}
+
+/* Удаляем старые стили */
+.cart-count {
+    display: none;
+}
+
+.cart-badge {
+    display: none;
+}
+
+@media (max-width: 992px) {
+    .cart-badge-absolute {
+        position: static;
+        margin-left: 5px;
+        display: inline-flex;
+    }
+
+    .cart-item {
+        position: static;
+    }
+}
+
+/* Улучшение отображения иконок над текстом */
+.navbar-nav .nav-link {
+    min-width: 70px;
+    text-align: center;
+}
+
+.navbar-nav .nav-link i {
+    font-size: 1.3rem;
+    margin-bottom: 4px;
+}
+
+.navbar-nav .nav-link span {
+    font-size: 0.7rem;
+    line-height: 1.2;
+    font-weight: normal;
+}
+
+/* Для выпадающих меню с иконкой */
+.simple-dropdown > .nav-link i:first-child {
+    font-size: 1.3rem;
+}
+
+/* Адаптация бейджа корзины для вертикального меню */
+.cart-item .cart-badge-absolute {
+    top: -2px;
+    right: 5px;
+}
+
+/* Для десктопа - нормальное отображение */
+@media (min-width: 993px) {
+    .navbar-nav .nav-link {
+        padding: 8px 12px !important;
+    }
+
+    .navbar-brand {
+        margin-right: 2rem;
+    }
+}
+
+/* Для мобильных - возвращаем горизонтальное расположение */
+@media (max-width: 992px) {
+    .navbar-nav .nav-link {
+        flex-direction: row !important;
+        justify-content: flex-start;
+        gap: 12px;
+        min-width: auto;
+    }
+
+    .navbar-nav .nav-link i {
+        margin-bottom: 0;
+        width: 25px;
+    }
+
+    .navbar-nav .nav-link span {
+        font-size: 0.9rem;
+    }
+
+    .cart-item .cart-badge-absolute {
+        position: static;
+        margin-left: 5px;
+    }
+}
+
+/* Анимация иконок при наведении */
+.navbar-nav .nav-link i {
+    transition: transform 0.2s ease;
+}
+
+.navbar-nav .nav-link:hover i {
+    transform: translateY(-2px);
+}
+
+/* Для кнопки темы */
+#themeToggle i {
+    transition: transform 0.3s ease;
+}
+
+#themeToggle:hover i {
+    transform: rotate(15deg);
+}
+
+.navbar-nav .nav-link {
+    gap: 2px; /* Вместо стандартного gap */
+}
+
+.navbar-nav .nav-link i,
+.navbar-nav .nav-link img {
+    margin-bottom: 0;
+}
+
+.navbar-nav .nav-link span {
+    line-height: 1;
+}
+
+/* Для мобильных устройств */
+@media (max-width: 768px) {
+    /* Размещаем меню слева */
+    .navbar-collapse {
+        text-align: left !important;
+    }
+
+    /* Элементы меню - в колонку слева */
+    .navbar-nav {
+        align-items: flex-start !important;
+        width: 100%;
+        padding-left: 0;
+    }
+
+    /* Каждый пункт меню на всю ширину */
+    .navbar-nav .nav-item {
+        width: 100%;
+        text-align: left;
+        margin: 5px 0;
+    }
+
+    /* Ссылки внутри пунктов меню */
+    .navbar-nav .nav-link {
+        flex-direction: row !important;
+        justify-content: flex-start !important;
+        align-items: center !important;
+        gap: 12px;
+        padding: 8px 15px;
+        width: 100%;
+    }
+
+    /* Иконки и текст в одной строке */
+    .navbar-nav .nav-link i,
+    .navbar-nav .nav-link img {
+        margin-bottom: 0 !important;
+        width: 24px;
+        text-align: center;
+    }
+
+    .navbar-nav .nav-link span {
+        margin-top: 0 !important;
+        margin-left: 10px;
+    }
+
+    /* Специально для выпадающих меню */
+    .simple-dropdown-menu {
+        position: static !important;
+        box-shadow: none;
+        border: none;
+        padding-left: 40px;
+        width: 100%;
+    }
+
+    /* Корзина - убираем абсолютное позиционирование бейджа */
+    .cart-item {
+        position: relative;
+    }
+
+    .cart-badge-absolute {
+        position: static !important;
+        display: inline-block;
+        margin-left: 10px;
+        background-color: #dc3545;
+        color: white;
+        border-radius: 50%;
+        padding: 2px 6px;
+        font-size: 12px;
+    }
+
+    /* Форма поиска - на всю ширину */
+    .d-flex.mx-auto {
+        width: 100% !important;
+        margin: 15px 0 !important;
+        order: -1; /* Поиск сверху */
+    }
+
+    /* Кнопка темы тоже слева */
+    #themeToggle {
+        flex-direction: row !important;
+        justify-content: flex-start !important;
+        width: 100%;
+    }
+}
+
+@media (max-width: 768px) {
+    /* Адаптация текста бренда */
+    .navbar-brand {
+        font-size: 14px !important;
+        white-space: normal !important;
+    }
+
+    /* Если нужно убрать дефис или сократить */
+    .navbar-brand br {
+        display: block; /* Перенос строки на мобильных */
+    }
+}
+
+@media (max-width: 480px) {
+    /* Для очень маленьких экранов */
+    .navbar-brand {
+        font-size: 12px !important;
+        max-width: 55%;
+    }
+}

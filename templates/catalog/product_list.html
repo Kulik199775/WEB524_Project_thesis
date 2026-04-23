@@ -8,7 +8,16 @@
     <div class="row">
         <!-- Sidebar с фильтрами -->
         <div class="col-md-3">
-            <div class="card mb-4">
+            <!-- Мобильная кнопка открытия фильтров -->
+            <button class="btn btn-outline-success d-md-none w-100 mb-3" type="button" data-bs-toggle="offcanvas" data-bs-target="#filtersOffcanvas">
+                <i class="bi bi-funnel"></i> Фильтры
+                {% if current_filters.skin_type or current_filters.price_min or current_filters.price_max or current_filters.in_stock or current_filters.rating_min %}
+                <span class="badge bg-danger ms-2">!</span>
+                {% endif %}
+            </button>
+
+            <!-- Десктопные фильтры (скрыты на телефонах) -->
+            <div class="card mb-4 d-none d-md-block">
                 <div class="card-header bg-success text-white">
                     <h5 class="mb-0"><i class="bi bi-funnel"></i> Фильтры</h5>
                 </div>
@@ -197,7 +206,7 @@
                                             {% endfor %}
                                         </div>
                                         {% if reviews_count > 0 %}
-                                            <span class="small" style="color: #000000;">{{ avg_rating|floatformat:1 }}</span>
+                                            <span class="text-muted small">{{ avg_rating|floatformat:1 }}</span>
                                             <span class="text-muted small">({{ reviews_count }})</span>
                                         {% else %}
                                             <span class="text-muted small">Нет отзывов</span>
@@ -258,34 +267,126 @@
         </div>
     </div>
 </div>
+
+<!-- Для мобильных устройств -->
+<div class="offcanvas offcanvas-start" tabindex="-1" id="filtersOffcanvas" data-bs-theme="dark">
+    <div class="offcanvas-header border-bottom" style="background-color: #28a745;">
+        <h5 class="mb-0 text-white"><i class="bi bi-funnel"></i> Фильтры</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas"></button>
+    </div>
+    <div class="offcanvas-body">
+        <form method="get" id="mobileFilterForm">
+            <!-- Дублируем все фильтры из основной формы -->
+            <!-- Сортировка -->
+            <div class="mb-3">
+                <label class="form-label fw-bold">Сортировка:</label>
+                <select name="sort" class="form-select form-select-sm" onchange="document.getElementById('mobileFilterForm').submit()">
+                    <option value="-created_at" {% if current_filters.sort == '-created_at' %}selected{% endif %}>Новинки</option>
+                    <option value="price" {% if current_filters.sort == 'price' %}selected{% endif %}>Цена: по возрастанию</option>
+                    <option value="-price" {% if current_filters.sort == '-price' %}selected{% endif %}>Цена: по убыванию</option>
+                    <option value="name" {% if current_filters.sort == 'name' %}selected{% endif %}>Название: А-Я</option>
+                    <option value="-name" {% if current_filters.sort == '-name' %}selected{% endif %}>Название: Я-А</option>
+                </select>
+            </div>
+
+            <hr>
+
+            <!-- Тип кожи -->
+            <div class="mb-3">
+                <label class="form-label fw-bold">Тип кожи:</label>
+                <div class="list-group list-group-flush">
+                    <a href="{% url 'catalog:product_list' %}" class="list-group-item list-group-item-action {% if not current_filters.skin_type %}active{% endif %}">
+                        Все типы
+                    </a>
+                    {% for skin_type in skin_types %}
+                    <a href="?skin_type={{ skin_type.slug }}{% if current_filters.sort %}&sort={{ current_filters.sort }}{% endif %}"
+                       class="list-group-item list-group-item-action {% if current_filters.skin_type == skin_type.slug %}active{% endif %}">
+                        {% if skin_type.icon %}<i class="bi bi-{{ skin_type.icon }}"></i>{% endif %}
+                        {{ skin_type.name }}
+                    </a>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <hr>
+
+            <!-- Фильтр по цене -->
+            <div class="mb-3">
+                <label class="form-label fw-bold">Цена:</label>
+                <div class="row g-2">
+                    <div class="col-6">
+                        <input type="number" name="price_min" class="form-control form-control-sm"
+                               placeholder="от" value="{{ current_filters.price_min }}">
+                    </div>
+                    <div class="col-6">
+                        <input type="number" name="price_max" class="form-control form-control-sm"
+                               placeholder="до" value="{{ current_filters.price_max }}">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Наличие -->
+            <div class="mb-3 form-check">
+                <input type="checkbox" name="in_stock" class="form-check-input" id="inStockMobile"
+                       {% if current_filters.in_stock %}checked{% endif %}>
+                <label class="form-check-label" for="inStockMobile">
+                    Только в наличии
+                </label>
+            </div>
+
+            <hr>
+
+            <!-- Фильтр по рейтингу -->
+            <div class="mb-3">
+                <label class="form-label fw-bold">Рейтинг:</label>
+                <div class="rating-filter">
+                    <div class="form-check">
+                        <input type="radio" name="rating_min" value="4" class="form-check-input"
+                               id="rating4Mobile" {% if current_filters.rating_min == '4' %}checked{% endif %}>
+                        <label class="form-check-label small" for="rating4Mobile">
+                            <i class="bi bi-star-fill text-warning"></i> 4 и выше
+                        </label>
+                    </div>
+                    <div class="form-check">
+                        <input type="radio" name="rating_min" value="3" class="form-check-input"
+                               id="rating3Mobile" {% if current_filters.rating_min == '3' %}checked{% endif %}>
+                        <label class="form-check-label small" for="rating3Mobile">
+                            <i class="bi bi-star-fill text-warning"></i> 3 и выше
+                        </label>
+                    </div>
+                    <div class="form-check">
+                        <input type="radio" name="rating_min" value="2" class="form-check-input"
+                               id="rating2Mobile" {% if current_filters.rating_min == '2' %}checked{% endif %}>
+                        <label class="form-check-label small" for="rating2Mobile">
+                            <i class="bi bi-star-fill text-warning"></i> 2 и выше
+                        </label>
+                    </div>
+                    <div class="form-check">
+                        <input type="radio" name="rating_min" value="" class="form-check-input"
+                               id="ratingAnyMobile" {% if not current_filters.rating_min %}checked{% endif %}>
+                        <label class="form-check-label small" for="ratingAnyMobile">
+                            Любой рейтинг
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <hr>
+
+            <!-- Кнопки в офф-канвасе -->
+            <div class="d-flex gap-2">
+                <button type="submit" class="btn btn-success flex-grow-1">
+                    <i class="bi bi-check-lg"></i> Применить
+                </button>
+                <a href="{% url 'catalog:product_list' %}" class="btn btn-outline-secondary">
+                    <i class="bi bi-x-circle"></i> Сброс
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+
 <style>
-    /* Стили для звезд */
-    .rating .bi-star-fill,
-    .rating .bi-star-half {
-        color: #ffc107 !important;
-    }
-
-    .rating .bi-star {
-        color: #dee2e6 !important;
-    }
-
-    body.dark-theme .rating .bi-star {
-        color: #6c757d !important;
-    }
-
-    body.dark-theme .rating .bi-star-fill,
-    body.dark-theme .rating .bi-star-half {
-        color: #ffc107 !important;
-    }
-
-    .card {
-        transition: transform 0.3s ease, box-shadow 0.3s ease;
-    }
-
-    .card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 10px 25px rgba(0,0,0,0.1);
-    }
 
     /* Анимация для активных фильтров */
     .badge.bg-success {
@@ -326,10 +427,6 @@
 
     body.dark-theme .rating-filter .form-check:hover {
         background-color: rgba(39, 174, 96, 0.15);
-    }
-
-    .add-to-cart-btn {
-        transition: all 0.3s ease;
     }
 
     .add-to-cart-btn:hover {
@@ -396,6 +493,35 @@ document.querySelectorAll('.favorite-btn').forEach(btn => {
         }
     });
 });
+});
+
+// Скрипт для синхронизации мобильной формы с основной
+document.addEventListener('DOMContentLoaded', function() {
+    const mobileForm = document.getElementById('mobileFilterForm');
+    if (mobileForm) {
+        mobileForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            // Копируем значения из мобильной формы в основную
+            const mainForm = document.getElementById('filterForm');
+
+            // Копируем значения всех полей
+            const formData = new FormData(mobileForm);
+            for (let [key, value] of formData.entries()) {
+                let input = mainForm.querySelector(`[name="${key}"]`);
+                if (input) {
+                    if (input.type === 'checkbox' || input.type === 'radio') {
+                        input.checked = (value === 'on') || (input.value === value);
+                    } else {
+                        input.value = value;
+                    }
+                }
+            }
+
+            // Отправляем основную форму
+            mainForm.submit();
+        });
+    }
 });
 </script>
 {% endblock %}

@@ -71,4 +71,117 @@
         </div>
     {% endif %}
 </div>
+<style>
+/* Адаптивное сжатие для мобильных */
+@media (max-width: 768px) {
+    /* Уменьшаем заголовок */
+    h1.mb-4 {
+        font-size: 24px;
+        margin-bottom: 15px !important;
+    }
+
+    /* Уменьшаем кнопки */
+    .btn-sm {
+        padding: 4px 8px !important;
+        font-size: 11px !important;
+    }
+
+    /* Уменьшаем иконки в кнопках */
+    .btn-sm i {
+        font-size: 12px;
+    }
+
+    /* Уменьшаем поле ввода количества */
+    input.form-control[style*="width: 80px"] {
+        width: 60px !important;
+        padding: 4px 6px !important;
+        font-size: 12px !important;
+    }
+
+    /* Уменьшаем отступы в таблице */
+    .table td, .table th {
+        padding: 8px 6px;
+        font-size: 13px;
+    }
+
+    /* Уменьшаем название товара */
+    .table td strong {
+        font-size: 13px;
+    }
+
+    /* Уменьшаем цены */
+    .table td, .table td strong {
+        font-size: 13px;
+    }
+
+    /* Главные кнопки внизу */
+    .d-flex.justify-content-between {
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .d-flex.justify-content-between > a,
+    .d-flex.justify-content-between > form {
+        width: 100%;
+    }
+
+    .d-flex.justify-content-between .btn,
+    .d-flex.justify-content-between button {
+        width: 100%;
+        padding: 8px 12px;
+        font-size: 13px;
+    }
+
+    /* Группа кнопок справа */
+    .d-flex.justify-content-between > form {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    /* Кнопка "Очистить корзину" */
+    .btn-outline-danger {
+        margin-top: 0;
+    }
+
+    /* Пустая корзина */
+    .text-center.py-5 i {
+        font-size: 3rem !important;
+    }
+
+    .text-center.py-5 h3 {
+        font-size: 18px;
+    }
+
+    .text-center.py-5 p {
+        font-size: 13px;
+    }
+
+    .text-center.py-5 .btn {
+        padding: 6px 16px;
+        font-size: 13px;
+    }
+}
+
+/* Для очень маленьких телефонов (до 480px) */
+@media (max-width: 480px) {
+    .table td, .table th {
+        padding: 6px 4px;
+        font-size: 12px;
+    }
+
+    .btn-sm {
+        padding: 3px 6px !important;
+        font-size: 10px !important;
+    }
+
+    input.form-control[style*="width: 80px"] {
+        width: 50px !important;
+    }
+
+    .btn-sm i {
+        font-size: 11px;
+    }
+}
+</style>
 {% endblock %}

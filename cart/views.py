@@ -3,8 +3,6 @@ from django.views.generic import View, TemplateView
 from django.shortcuts import redirect, get_object_or_404, reverse
 from django.http import JsonResponse
 from django.contrib import messages
-from django.views.decorators.csrf import csrf_exempt
-from django.utils.decorators import method_decorator
 from .cart import Cart
 from catalog.models import Product
 
@@ -23,7 +21,7 @@ class CartAddView(View):
                 quantity = int(data.get('quantity', 1))
             else:
                 quantity = int(request.POST.get('quantity', 1))
-        except:
+        except (ValueError, TypeError, json.JSONDecodeError):
             quantity = 1
 
         # Проверка наличия

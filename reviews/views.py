@@ -1,17 +1,15 @@
-from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView, View
-from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
+from django.views.generic import ListView, CreateView, UpdateView, DeleteView, View
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse_lazy
 from django.contrib import messages
-from django.db.models import Avg, Count, Q
-from django.core.paginator import Paginator
+from django.db.models import Avg
 from common.mixins import ModeratorRequiredMixin, UserIsOwnerMixin
 from django.core.cache import cache
 
 from .models import Review, ReviewLike
-from .forms import ReviewForm, ReviewModerationForm
+from .forms import ReviewForm
 from catalog.models import Product
-
 
 
 class ReviewCreateView(LoginRequiredMixin, CreateView):

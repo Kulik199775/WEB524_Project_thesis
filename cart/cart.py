@@ -4,6 +4,7 @@ from catalog.models import Product
 
 class Cart:
     """Для управления корзиной покупок"""
+
     def __init__(self, request):
         self.session = request.session
         cart = self.session.get(settings.CART_SESSION_ID)

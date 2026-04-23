@@ -1,9 +1,8 @@
-from django.contrib.auth.forms import PasswordChangeForm
-from django.views.generic import CreateView, UpdateView, DetailView, ListView, View, DeleteView
+from django.views.generic import CreateView, UpdateView, DetailView, ListView
 from django.contrib.auth.views import LoginView, LogoutView, PasswordChangeView
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.contrib.auth import login, authenticate
-from django.shortcuts import get_object_or_404, redirect, render
+from django.contrib.auth import login
+from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse_lazy, reverse
 from django.contrib import messages
 from django.db.models import Q
@@ -22,7 +21,6 @@ import string
 from .models import User, UserRoles
 from .forms import UserRegistrationForm, UserLoginForm, UserProfileForm, UserAdminForm, CustomPasswordChangeForm
 from .services import send_register_email
-from .verification_service import VerificationService
 
 
 def generate_verification_code():
@@ -133,9 +131,9 @@ class UserListView(LoginRequiredMixin, AdminRequiredMixin, ListView):
 
         if search:
             queryset = queryset.filter(
-                Q(email__icontains=search) |
-                Q(first_name__icontains=search) |
-                Q(last_name__icontains=search)
+                Q(email__icontains=search)
+                | Q(first_name__icontains=search)
+                | Q(last_name__icontains=search)
             )
         if role:
             queryset = queryset.filter(role=role)
@@ -485,7 +483,7 @@ class ResendCodeAjaxView(View):
             if action == 'login':
                 user_id = cached_data.get('user_id')
                 if user_id:
-                    user = User.objects.get(id=user_id)
+                    _ = User.objects.get(id=user_id)
                     send_mail(
                         subject='Новый код для входа в Kasmia',
                         message=f'Ваш новый код для входа: {new_code}\nКод действителен 10 минут.',

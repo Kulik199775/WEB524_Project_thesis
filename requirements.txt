@@ -3,3 +3,4 @@ python-dotenv
 Pillow
 redis
 better-profanity
+flake8

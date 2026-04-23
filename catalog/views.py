@@ -1,12 +1,10 @@
-from django.views.decorators.cache import cache_page
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView, View
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse_lazy
 from django.contrib import messages
-from django.db.models import Q, Avg, Count
+from django.db.models import Q, Avg
 from django.core.cache import cache
-from django.core.paginator import Paginator
 from django.http import JsonResponse
 from common.mixins import AdminRequiredMixin
 from .models import Product, Category, SkinType, Favorite, Ingredient
@@ -249,7 +247,7 @@ class ProductDetailView(DetailView):
                 category=self.object.category,
                 is_active=True
             ).exclude(id=self.object.id)[:4])
-            cache.set(related_key, related_products, 60 * 60) # 1 час
+            cache.set(related_key, related_products, 60 * 60)  # 1 час
         context['related_products'] = related_products
 
         context['title'] = self.object.name

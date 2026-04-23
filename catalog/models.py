@@ -99,7 +99,7 @@ class Product(models.Model):
         db_table = 'catalog_products'
         verbose_name = 'Товар'
         verbose_name_plural = 'Товары'
-        ordering = ['-created_at'] # сортировка от новых к старым
+        ordering = ['-created_at']  # сортировка от новых к старым
 
     def __str__(self):
         return self.name
@@ -132,6 +132,7 @@ class Product(models.Model):
         """Количество отзывов"""
         return self.reviews.filter(is_approved=True).count()
 
+
 class Favorite(models.Model):
     """Избранные товары пользователя"""
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='favorites', verbose_name='Пользователь')
@@ -143,7 +144,7 @@ class Favorite(models.Model):
         verbose_name = 'Избранное'
         verbose_name_plural = 'Избранные товары'
         ordering = ['-created_at']
-        unique_together = ('user', 'product') # один пользователь может добавить в избранное товар только один раз
+        unique_together = ('user', 'product')  # один пользователь может добавить в избранное товар только один раз
 
     def __str__(self):
         return f'{self.user.email} - {self.product.name}'

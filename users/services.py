@@ -2,7 +2,6 @@ from django.conf import settings
 from django.core.mail import send_mail
 from django.template.loader import render_to_string
 from django.utils.html import strip_tags
-from django.contrib.auth import login
 from django.utils import timezone
 from datetime import timedelta
 import random
@@ -54,34 +53,6 @@ def send_new_password(email, new_password, user=None):
     else:
         plain_message = f'Ваш новый пароль: {new_password}'
         html_message = None
-
-    send_mail(
-        subject=subject,
-        message=plain_message,
-        from_email=settings.EMAIL_HOST_USER,
-        recipient_list=[email],
-        html_message=html_message,
-        fail_silently=False,
-    )
-
-
-def send_verification_code(email, code, user=None):
-    """Отправка кода подтверждения для входа"""
-    subject = 'Код для входа в Kasmia'
-
-    context = {
-        'email': email,
-        'code': code,
-        'expiry_minutes': getattr(settings, 'VERIFICATION_CODE_EXPIRY_MINUTES', 10),
-        'site_name': 'Kasmia',
-        'site_url': 'http://127.0.0.1:8000',
-    }
-
-    if user:
-        context['user'] = user
-
-    html_message = render_to_string('emails/login_code.html', context)
-    plain_message = strip_tags(html_message)
 
     send_mail(
         subject=subject,

@@ -1,7 +1,6 @@
 from django.db import models
 from django.conf import settings
-from catalog.models import Product
-from django.core.validators import MinValueValidator
+
 
 NULLABLE = {'blank': True, 'null': True}
 

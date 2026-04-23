@@ -1,11 +1,12 @@
+import csv
+from decimal import Decimal
 from django.contrib import admin
 from django.utils.html import format_html
-from django.db.models import Count
 from django.utils.safestring import mark_safe
+from django.core.exceptions import ObjectDoesNotExist
+from django.http import HttpResponse
 
 from .models import Category, SkinType, Ingredient, Product, Favorite
-
-from decimal import Decimal
 
 
 @admin.register(Category)
@@ -39,7 +40,7 @@ class CategoryAdmin(admin.ModelAdmin):
         try:
             count = obj.products.count()
             return mark_safe(f'<span style="font-weight: bold;">{count}</span>')
-        except:
+        except (AttributeError, ObjectDoesNotExist):
             return '0'
     products_count.short_description = 'Товаров'
 
@@ -48,7 +49,7 @@ class CategoryAdmin(admin.ModelAdmin):
         try:
             if obj and obj.image and obj.image.url:
                 return mark_safe(f'<img src="{obj.image.url}" style="width: 50px; height: 50px; object-fit: cover;" />')
-        except:
+        except (AttributeError, ValueError, ObjectDoesNotExist):
             pass
         return mark_safe('<span style="color: gray;">Нет фото</span>')  # ← Исправлено
     image_preview.short_description = 'Превью'
@@ -58,7 +59,7 @@ class CategoryAdmin(admin.ModelAdmin):
         try:
             if obj and obj.image and obj.image.url:
                 return mark_safe(f'<img src="{obj.image.url}" style="width: 200px; height: auto;" />')
-        except:
+        except (AttributeError, ValueError, ObjectDoesNotExist):
             pass
         return 'Нет изображения'
     image_preview_large.short_description = 'Изображение'
@@ -74,6 +75,7 @@ class CategoryAdmin(admin.ModelAdmin):
     def deactivate_categories(self, request, queryset):
         updated = queryset.update(is_active=False)
         self.message_user(request, f'Деактивировано {updated} категорий.')
+
 
 @admin.register(SkinType)
 class SkinTypeAdmin(admin.ModelAdmin):
@@ -157,7 +159,7 @@ class IngredientAdmin(admin.ModelAdmin):
             count = obj.products.count()
             color = '#2bde3f' if count > 10 else '#ffc107' if count > 0 else '#dc3545'
             return mark_safe(f'<span style="color: {color}; font-weight: bold;">{count}</span>')
-        except:
+        except (AttributeError, ObjectDoesNotExist):
             return '0'
     products_count.short_description = 'Товаров'
 
@@ -220,7 +222,7 @@ class ProductAdmin(admin.ModelAdmin):
                 return mark_safe('<span style="color: green; font-weight: bold;">✓ В наличии</span>')
             else:
                 return mark_safe('<span style="color: red; font-weight: bold;">✗ Нет в наличии</span>')
-        except:
+        except (AttributeError, ObjectDoesNotExist):
             return mark_safe('<span style="color: gray;">-</span>')
     is_available.short_description = 'Доступность'
     is_available.admin_order_field = 'stock'
@@ -319,8 +321,6 @@ class FavoriteAdmin(admin.ModelAdmin):
     @admin.action(description='Экспортировать выбранные записи')
     def export_selected_favorites(self, request, queryset):
         """Экспорт выбранных записей в CSV"""
-        import csv
-        from django.http import HttpResponse
 
         response = HttpResponse(content_type='text/csv')
         response['Content-Disposition'] = 'attachment; filename="favorites_export.csv"'

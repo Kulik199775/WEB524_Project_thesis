@@ -6,9 +6,12 @@ from django.contrib import messages
 from django.db.models import Avg, Count, Q
 from django.core.paginator import Paginator
 from common.mixins import ModeratorRequiredMixin, UserIsOwnerMixin
+from django.core.cache import cache
+
 from .models import Review, ReviewLike
 from .forms import ReviewForm, ReviewModerationForm
 from catalog.models import Product
+
 
 
 class ReviewCreateView(LoginRequiredMixin, CreateView):
@@ -155,7 +158,6 @@ class UserReviewsView(LoginRequiredMixin, ListView):
 
 
 class ProductReviewsView(ListView):
-    """Список отзывов на товар с пагинацией и статистикой"""
     model = Review
     template_name = 'reviews/product_reviews.html'
     context_object_name = 'reviews'
@@ -165,47 +167,56 @@ class ProductReviewsView(ListView):
         self.product = get_object_or_404(Product, pk=self.kwargs['product_pk'], is_active=True)
         return super().dispatch(request, *args, **kwargs)
 
+    def get_cache_key(self):
+        page = self.request.GET.get('page', 1)
+        return f'reviews_{self.product.id}_page_{page}'
+
     def get_queryset(self):
-        return Review.objects.filter(product=self.product, is_approved=True).select_related('user')
+        cache_key = self.get_cache_key()
+        reviews = cache.get(cache_key)
+
+        if reviews is None:
+            reviews = Review.objects.filter(
+                product=self.product,
+                is_approved=True
+            ).select_related('user')
+            cache.set(cache_key, list(reviews), 60 * 15)
+
+        return reviews
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['product'] = self.product
         context['title'] = f'Отзывы на {self.product.name}'
 
-        # Получаем все одобренные отзывы для статистики
-        approved_reviews = Review.objects.filter(product=self.product, is_approved=True)
-        total_reviews = approved_reviews.count()
-        avg_rating = approved_reviews.aggregate(Avg('rating'))['rating__avg'] or 0
+        # Кэшируем статистику отзывов
+        stats_key = f'reviews_stats_{self.product.id}'
+        stats = cache.get(stats_key)
 
-        # Подсчет количества оценок по звездам
-        rating_counts = {5: 0, 4: 0, 3: 0, 2: 0, 1: 0}
-        for review in approved_reviews:
-            if review.rating in rating_counts:
+        if stats is None:
+            reviews = Review.objects.filter(product=self.product, is_approved=True)
+            total_reviews = reviews.count()
+            avg_rating = reviews.aggregate(Avg('rating'))['rating__avg'] or 0
+
+            rating_counts = {5: 0, 4: 0, 3: 0, 2: 0, 1: 0}
+            for review in reviews:
                 rating_counts[review.rating] += 1
 
-        # Подсчет процентов
-        rating_percentages = {}
-        for star in [5, 4, 3, 2, 1]:
-            if total_reviews > 0:
-                rating_percentages[star] = round((rating_counts[star] / total_reviews) * 100)
-            else:
-                rating_percentages[star] = 0
+            rating_percentages = {}
+            for star in [5, 4, 3, 2, 1]:
+                if total_reviews > 0:
+                    rating_percentages[star] = round((rating_counts[star] / total_reviews) * 100)
+                else:
+                    rating_percentages[star] = 0
 
-        context['stats'] = {
-            'total_reviews': total_reviews,
-            'avg_rating': round(avg_rating, 1),
-            'rating_counts': rating_counts,
-            'rating_percentages': rating_percentages,
-        }
+            stats = {
+                'total_reviews': total_reviews,
+                'avg_rating': round(avg_rating, 1),
+                'rating_counts': rating_counts,
+                'rating_percentages': rating_percentages,
+            }
 
-        # Проверка, оставлял ли пользователь отзыв
-        if self.request.user.is_authenticated:
-            context['user_reviewed'] = Review.objects.filter(
-                product=self.product,
-                user=self.request.user
-            ).exists()
-        else:
-            context['user_reviewed'] = False
+            cache.set(stats_key, stats, 60 * 30)
 
+        context['stats'] = stats
         return context

@@ -2,6 +2,9 @@ from django.db import models
 from django.core.validators import MinValueValidator
 from django.urls import reverse
 from django.conf import settings
+from django.core.cache import cache
+from django.dispatch import receiver
+from django.db.models.signals import post_save, post_delete
 
 from users.models import NULLABLE
 
@@ -145,3 +148,16 @@ class Favorite(models.Model):
     def __str__(self):
         return f'{self.user.email} - {self.product.name}'
 
+
+@receiver([post_save, post_delete], sender=Product)
+def clear_product_cache(sender, instance, **kwargs):
+    """Очищает кэш при изменении товара"""
+    # Удаляем кэш детальной страницы
+    cache.delete(f'product_detail_{instance.id}')
+
+    # Удаляем кэш похожих товаров
+    cache.delete(f'related_products_{instance.id}')
+
+    cache.delete('categories_list')
+    cache.delete('skin_types_list')
+    cache.delete('ingredients_list')

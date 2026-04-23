@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
 
+    'redis',
 
     # мои приложения
     'users',
@@ -163,27 +164,50 @@ MEDIA_ROOT = (
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 AUTH_USER_MODEL = 'users.User'
 
-# LOGIN_REDIRECT_URL = "dogs:index"
-# LOGOUT_REDIRECT_URL = "dogs:index"
-# LOGIN_URL = 'users:user_login'
-# CACHE_ENABLED = os.getenv("CACHE_ENABLED") == 'True'
-# if CACHE_ENABLED:
-#     CACHES = {
-#         "default":
-#             {
-#                 'BACKEND': 'django.core.cache.backends.redis.RedisCache',
-#                 'LOCATION': os.getenv("CACHE_LOCATION"),
-#             }
-#     }
-#
-#
+CACHED_ENABLED = os.getenv('CACHED_ENABLED', 'False').lower() == 'true'
 
-CACHES = {
-    'default': {
-        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
-        'LOCATION': 'unique-snowflake',
+if CACHED_ENABLED:
+    # Получаем URL Redis из переменных окружения
+    REDIS_URL = os.getenv('CACHE_LOCATION', 'redis://127.0.0.1:6379')
+
+    # Добавляем номер базы данных, если его нет
+    if not REDIS_URL.endswith('/'):
+        REDIS_URL = f"{REDIS_URL}/1"
+
+    CACHES = {
+        "default": {
+            "BACKEND": "django_redis.cache.RedisCache",
+            "LOCATION": REDIS_URL,
+            "OPTIONS": {
+                "CLIENT_CLASS": "django_redis.client.DefaultClient",
+                "IGNORE_EXCEPTIONS": True,
+                "SOCKET_CONNECT_TIMEOUT": 5,
+                "SOCKET_TIMEOUT": 5,
+                "CONNECTION_POOL_CLASS": "redis.BlockingConnectionPool",
+                "CONNECTION_POOL_CLASS_KWARGS": {
+                    "max_connections": 50,
+                    "timeout": 20,
+                },
+            },
+            "KEY_PREFIX": "kasmia",
+            "TIMEOUT": 60 * 15,
+        }
     }
-}
+
+    # Хранение сессий в Redis
+    SESSION_ENGINE = "django.contrib.sessions.backends.cache"
+    SESSION_CACHE_ALIAS = "default"
+
+    print(f"✅ Redis кэширование включено: {REDIS_URL}")
+else:
+    # Если Redis выключен - используем локальный кэш
+    CACHES = {
+        "default": {
+            "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
+            "LOCATION": "unique-snowflake",
+        }
+    }
+    print("⚠️ Redis кэширование отключено, используется локальный кэш")
 
 EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
 EMAIL_HOST = 'smtp.yandex.com'

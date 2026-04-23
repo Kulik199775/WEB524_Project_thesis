@@ -1,5 +1,6 @@
 from django.urls import path
 from . import views
+from django.views.decorators.cache import cache_page, never_cache
 
 app_name = 'catalog'
 
@@ -14,20 +15,22 @@ urlpatterns = [
 
     # Товары
     path('product/<int:pk>/', views.ProductDetailView.as_view(), name='product_detail'),
-    path('product/<int:pk>/add-to-favorite/', views.AddToFavoriteView.as_view(), name='add_to_favorite'),
-    path('product/<int:pk>/remove-from-favorite/', views.RemoveFromFavoriteView.as_view(), name='remove_from_favorite'),
+    path('product/<int:pk>/add-to-favorite/', never_cache(views.AddToFavoriteView.as_view()), name='add_to_favorite'),
+    path('product/<int:pk>/remove-from-favorite/', never_cache(views.RemoveFromFavoriteView.as_view()),
+         name='remove_from_favorite'),
 
     # CRUD для товаров (только для админа)
-    path('product/create/', views.ProductCreateView.as_view(), name='product_create'),
-    path('product/<int:pk>/update/', views.ProductUpdateView.as_view(), name='product_update'),
-    path('product/<int:pk>/delete/', views.ProductDeleteView.as_view(), name='product_delete'),
+    path('product/create/', never_cache(views.ProductCreateView.as_view()), name='product_create'),
+    path('product/<int:pk>/update/', never_cache(views.ProductUpdateView.as_view()), name='product_update'),
+    path('product/<int:pk>/delete/', never_cache(views.ProductDeleteView.as_view()), name='product_delete'),
 
     # Избранное
-    path('favorites/', views.FavoriteListView.as_view(), name='favorites'),
+    path('favorites/', never_cache(views.FavoriteListView.as_view()), name='favorites'),
 
     # Поиск
     path('search/', views.SearchResultsView.as_view(), name='search'),
 
     # Фильтрация по типу кожи
-    path('skin-type/<slug:slug>/', views.SkinTypeProductsView.as_view(), name='skin_type_products'),
+    path('skin-type/<slug:slug>/', views.SkinTypeProductsView.as_view(),
+         name='skin_type_products'),
 ]
